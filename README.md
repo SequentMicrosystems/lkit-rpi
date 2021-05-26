@@ -14,7 +14,7 @@ You need to enable the I2C communication:
 ~/lkit-rpi$ sudo make install
 ```
 
-Now you can access all the functions of the relays board through the command "4relplus". Use -h option for help:
+Now you can access all the functions of the relays board through the command "lkit". Use -h option for help:
 ```bash
 ~$ lkit -h
 ```
