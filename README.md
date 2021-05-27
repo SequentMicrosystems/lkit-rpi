@@ -27,4 +27,4 @@ If you clone the repository any update can be made with the following commands:
 ~/lkit-rpi$ sudo make install
 ```  
 
-## [Frmware Update](https://github.com/SequentMicrosystems/lkit-rpi/tree/main/update)
+## [Firmware Update](https://github.com/SequentMicrosystems/lkit-rpi/tree/main/update)
