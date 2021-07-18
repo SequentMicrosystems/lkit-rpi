@@ -8,17 +8,21 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <math.h>
 
 #include "lkit.h"
 #include "comm.h"
 #include "gpio.h"
 #include "cli.h"
+#include "gpio.h"
 
 #define VERSION_BASE	(int)1
 #define VERSION_MAJOR	(int)0
 #define VERSION_MINOR	(int)0
 
 #define UNUSED(X) (void)X      /* To avoid gcc/g++ warnings */
+#define IN_CH_NR	4
+#define RELAY_NR 	2
 #define CMD_ARRAY_SIZE	8
 
 char *warranty =
@@ -36,6 +40,17 @@ char *warranty =
 		"			\n"
 		"		You should have received a copy of the GNU Lesser General Public License\n"
 		"		along with this program. If not, see <http://www.gnu.org/licenses/>.";
+
+const int gInPins[IN_CH_NR] =
+{
+	4,
+	17,
+	27,
+	22};
+const int gRelayPins[RELAY_NR] =
+{
+	19,
+	16};
 
 void usage(void)
 {
@@ -97,6 +112,7 @@ int boardCheck(void)
 	}
 	return OK;
 }
+
 int doHelp(int argc, char *argv[]);
 const CliCmdType CMD_HELP =
 {
@@ -210,7 +226,7 @@ const CliCmdType CMD_LIST =
 
 int doList(int argc, char *argv[])
 {
-	
+
 	UNUSED(argc);
 	UNUSED(argv);
 
@@ -232,7 +248,7 @@ const CliCmdType CMD_BOARD =
 	1,
 	&doBoard,
 	"\t-board		Display the board status and firmware version number\n",
-	"\tUsage:		lkit  -board\n",
+	"\tUsage:		lkit -board\n",
 	"",
 	"\tExample:		lkit -board  Display vcc, temperature, firmware version \n"};
 
@@ -242,8 +258,8 @@ int doBoard(int argc, char *argv[])
 	u8 buff[4];
 	int resp = 0;
 	int temperature = 25;
-	float voltage = 3.3;
-	
+	float voltage = 0;
+
 	UNUSED(argc);
 	UNUSED(argv);
 
@@ -269,9 +285,438 @@ int doBoard(int argc, char *argv[])
 		exit(1);
 	}
 	printf(
-		"Hardware %02d.%02d, Firmware %02d.%02d, CPU temperature %d C, voltage %0.2f V\n",
+		"Hardware %02d.%02d, Firmware %02d.%02d, CPU temperature %d C, voltage %0.3f V\n",
 		(int)buff[0], (int)buff[1], (int)buff[2], (int)buff[3], temperature,
 		voltage);
+	return OK;
+}
+
+int doRelayWrite(int argc, char *argv[]);
+const CliCmdType CMD_RELAY_WRITE =
+{
+	"relwr",
+	1,
+	&doRelayWrite,
+	"\trelwr:		Set relays On/Off\n",
+	"\tUsage:		lkit relwr <channel> <0/1>\n",
+	"",
+	"\tExample:		lkit relwr 2 1; Turn ON Relay #2\n"};
+
+int doRelayWrite(int argc, char *argv[])
+{
+	int ch = 0;
+	int state = 0;
+	int ret = 0;
+
+	if (argc != 4)
+	{
+		return ARG_CNT_ERR;
+	}
+	ch = atoi(argv[2]);
+	if (ch < 1 || ch > 2)
+	{
+		printf("Invalid relay number [1..2]!\n");
+		return ARG_ERR;
+	}
+	state = atoi(argv[3]);
+	if (state != 0)
+	{
+		ret = GPIOWrite(gRelayPins[ch - 1], 1);
+	}
+	else
+	{
+		ret = GPIOWrite(gRelayPins[ch - 1], 0);
+	}
+	return ret;
+}
+
+int doOptoRead(int argc, char *argv[]);
+const CliCmdType CMD_OPTO_READ =
+{
+	"optrd",
+	1,
+	&doOptoRead,
+	"\toptrd:		Read optocoupled inputs status\n",
+	"\tUsage:		lkit optrd <channel>\n",
+	"\tUsage:		lkit optrd\n",
+	"\tExample:		lkit optrd 2; Read Status of Optocoupled input ch #2\n"};
+
+int doOptoRead(int argc, char *argv[])
+{
+	int ch = 0;
+	int state = 0;
+	int ret = OK;
+
+	if (argc == 2)
+	{
+		for (ch = 0; ch < IN_CH_NR; ch++)
+		{
+			if (0 == GPIORead(gInPins[ch]))
+			{
+				state += 1 << ch;
+			}
+		}
+		printf("%d\n", state);
+	}
+	else if (argc == 3)
+	{
+		ch = atoi(argv[2]);
+		if (ch < 1 || ch > IN_CH_NR)
+		{
+			printf("Invalid input channel number [1..4]!\n");
+			ret = ARG_ERR;
+		}
+		else
+		{
+			if (0 == GPIORead(gInPins[ch - 1]))
+			{
+				state = 1;
+			}
+			printf("%d\n", state);
+		}
+	}
+	else
+	{
+		ret = ARG_CNT_ERR;
+	}
+	return ret;
+}
+
+int doVinRead(int argc, char *argv[]);
+const CliCmdType CMD_VIN_READ =
+{
+	"vinrd",
+	1,
+	&doVinRead,
+	"\tvinrd		Display the 0-10V input port readings\n",
+	"\tUsage:		lkit vinrd\n",
+	"",
+	"\tExample:		lkit vinrd  Display the voltage on 0-10v in port\n"};
+
+int doVinRead(int argc, char *argv[])
+{
+	int dev = -1;
+	u8 buff[2];
+	int resp = 0;
+
+	UNUSED(argv);
+	if (argc != 2)
+	{
+		return ARG_CNT_ERR;
+	}
+	dev = doBoardInit();
+	if (dev <= 0)
+	{
+		return FAIL;
+	}
+	resp = i2cMem8Read(dev, I2C_MEM_V_IN_ADD, buff, 2);
+	if (FAIL == resp)
+	{
+		printf("Fail to read!\n");
+		return FAIL;
+	}
+
+	memcpy(&resp, buff, 2);
+	printf("%.3f\n", (float)resp / 1000);
+	return OK;
+}
+
+int doVoutRead(int argc, char *argv[]);
+const CliCmdType CMD_VOUT_READ =
+{
+	"voutrd",
+	1,
+	&doVoutRead,
+	"\tvoutrd		Display the 0-10V output port value\n",
+	"\tUsage:		lkit voutrd\n",
+	"",
+	"\tExample:		lkit voutrd  Display the voltage on 0-10V output port\n"};
+
+int doVoutRead(int argc, char *argv[])
+{
+	int dev = -1;
+	u8 buff[2];
+	int resp = 0;
+
+	UNUSED(argv);
+	if (argc != 2)
+	{
+		return ARG_CNT_ERR;
+	}
+
+	dev = doBoardInit();
+	if (dev <= 0)
+	{
+		return FAIL;
+	}
+	resp = i2cMem8Read(dev, I2C_MEM_V_OUT_ADD, buff, 2);
+	if (FAIL == resp)
+	{
+		printf("Fail to read!\n");
+		return FAIL;
+	}
+
+	memcpy(&resp, buff, 2);
+	printf("%.3f\n", (float)resp / 1000);
+	return OK;
+}
+
+int doVoutWrite(int argc, char *argv[]);
+const CliCmdType CMD_VOUT_WRITE =
+{
+	"voutwr",
+	1,
+	&doVoutWrite,
+	"\tvoutwr		Set the 0-10V output port value\n",
+	"\tUsage:		lkit voutwr <value(V)>\n",
+	"",
+	"\tExample:		lkit voutwr 5.52  Set the voltage on 0-10V output port at 5.52V\n"};
+
+int doVoutWrite(int argc, char *argv[])
+{
+	int dev = -1;
+	u8 buff[2];
+	int resp = 0;
+	float value = 0;
+	u16 aux = 0;
+
+	UNUSED(argv);
+	if (argc != 3)
+	{
+		return ARG_CNT_ERR;
+	}
+	
+	dev = doBoardInit();
+	if (dev <= 0)
+	{
+		return FAIL;
+	}
+	value = atof(argv[2]);
+	if(value > 10 || value < 0)
+	{
+		return ARG_ERR;
+	}
+	aux = (u16)round(value*1000);
+	memcpy(buff, &aux, 2);
+	resp = i2cMem8Write(dev, I2C_MEM_V_OUT_ADD, buff, 2);
+	if (FAIL == resp)
+	{
+		printf("Fail to write!\n");
+		return FAIL;
+	}
+	return OK;
+}
+
+int doIinRead(int argc, char *argv[]);
+const CliCmdType CMD_IIN_READ =
+{
+	"iinrd",
+	1,
+	&doIinRead,
+	"\tiinrd		Display the 4-20mA input port readings\n",
+	"\tUsage:		lkit iinrd\n",
+	"",
+	"\tExample:		lkit iinrd  Display the voltage on 4-20mA in port\n"};
+
+int doIinRead(int argc, char *argv[])
+{
+	int dev = -1;
+	u8 buff[2];
+	int resp = 0;
+
+	UNUSED(argv);
+	if (argc != 2)
+	{
+		return ARG_CNT_ERR;
+	}
+
+	dev = doBoardInit();
+	if (dev <= 0)
+	{
+		return FAIL;
+	}
+	resp = i2cMem8Read(dev, I2C_MEM_I_IN_ADD, buff, 2);
+	if (FAIL == resp)
+	{
+		printf("Fail to read!\n");
+		return FAIL;
+	}
+
+	memcpy(&resp, buff, 2);
+	printf("%.3f\n", (float)resp / 1000);
+	return OK;
+}
+
+int doIoutRead(int argc, char *argv[]);
+const CliCmdType CMD_IOUT_READ =
+{
+	"ioutrd",
+	1,
+	&doIoutRead,
+	"\tioutrd		Display the 4-20mA output port value\n",
+	"\tUsage:		lkit ioutrd\n",
+	"",
+	"\tExample:		lkit ioutrd  Display the voltage on 4_20mA output port\n"};
+
+int doIoutRead(int argc, char *argv[])
+{
+	int dev = -1;
+	u8 buff[2];
+	int resp = 0;
+
+	UNUSED(argv);
+	if (argc != 2)
+	{
+		return ARG_CNT_ERR;
+	}
+
+	dev = doBoardInit();
+	if (dev <= 0)
+	{
+		return FAIL;
+	}
+	resp = i2cMem8Read(dev, I2C_MEM_I_OUT_ADD, buff, 2);
+	if (FAIL == resp)
+	{
+		printf("Fail to read!\n");
+		return FAIL;
+	}
+
+	memcpy(&resp, buff, 2);
+	printf("%.3f\n", (float)resp / 1000);
+	return OK;
+}
+
+int doIoutWrite(int argc, char *argv[]);
+const CliCmdType CMD_IOUT_WRITE =
+{
+	"ioutwr",
+	1,
+	&doIoutWrite,
+	"\tioutwr		Set the 4-20mA output port value\n",
+	"\tUsage:		lkit ioutwr <value(mA)>\n",
+	"",
+	"\tExample:		lkit ioutwr 5.52  Set the current on 4-20mA output port at 5.52mA\n"};
+
+int doIoutWrite(int argc, char *argv[])
+{
+	int dev = -1;
+	u8 buff[2];
+	int resp = 0;
+	float value = 0;
+	u16 aux = 0;
+
+	UNUSED(argv);
+	if (argc != 3)
+	{
+		return ARG_CNT_ERR;
+	}
+	
+	dev = doBoardInit();
+	if (dev <= 0)
+	{
+		return FAIL;
+	}
+	value = atof(argv[2]);
+	if(value > 20 || value < 4)
+	{
+		return ARG_ERR;
+	}
+	aux = (u16)round(value*1000);
+	memcpy(buff, &aux, 2);
+	resp = i2cMem8Write(dev, I2C_MEM_I_OUT_ADD, buff, 2);
+	if (FAIL == resp)
+	{
+		printf("Fail to write!\n");
+		return FAIL;
+	}
+	return OK;
+}
+
+int doMotRead(int argc, char *argv[]);
+const CliCmdType CMD_MOT_READ =
+{
+	"motrd",
+	1,
+	&doMotRead,
+	"\tmotrd		Display the motor power value (-100..100) in %\n",
+	"\tUsage:		lkit motrd\n",
+	"",
+	"\tExample:		lkit motrd  Display the motor power value \n"};
+
+int doMotRead(int argc, char *argv[])
+{
+	int dev = -1;
+	u8 buff[2];
+	int resp = 0;
+	s16 val = 0;
+
+	UNUSED(argv);
+	if (argc != 2)
+	{
+		return ARG_CNT_ERR;
+	}
+
+	dev = doBoardInit();
+	if (dev <= 0)
+	{
+		return FAIL;
+	}
+	resp = i2cMem8Read(dev, I2C_MEM_MOT_VAL, buff, 2);
+	if (FAIL == resp)
+	{
+		printf("Fail to read!\n");
+		return FAIL;
+	}
+
+	memcpy(&val, buff, 2);
+	printf("%.1f\n", (float)val / 10);
+	return OK;
+}
+
+int doMotWrite(int argc, char *argv[]);
+const CliCmdType CMD_MOT_WRITE =
+{
+	"motwr",
+	1,
+	&doMotWrite,
+	"\tmotwr		Set the motor port output power (-100..100)\n",
+	"\tUsage:		lkit motwr <value(%)>\n",
+	"",
+	"\tExample:		lkit motwr -25.2  Set the motor power to 25.2% in reverse \n"};
+
+int doMotWrite(int argc, char *argv[])
+{
+	int dev = -1;
+	u8 buff[2];
+	int resp = 0;
+	float value = 0;
+	s16 aux = 0;
+
+	UNUSED(argv);
+	if (argc != 3)
+	{
+		return ARG_CNT_ERR;
+	}
+	
+	dev = doBoardInit();
+	if (dev <= 0)
+	{
+		return FAIL;
+	}
+	value = atof(argv[2]);
+	if(value > 100 || value < -100)
+	{
+		return ARG_ERR;
+	}
+	aux = (s16)round(value*10);
+	memcpy(buff, &aux, 2);
+	resp = i2cMem8Write(dev, I2C_MEM_MOT_VAL, buff, 2);
+	if (FAIL == resp)
+	{
+		printf("Fail to write!\n");
+		return FAIL;
+	}
 	return OK;
 }
 
@@ -282,6 +727,16 @@ const CliCmdType *gCmdArray[] =
 	&CMD_WAR,
 	&CMD_LIST,
 	&CMD_BOARD,
+	&CMD_RELAY_WRITE,
+	&CMD_OPTO_READ,
+	&CMD_VIN_READ,
+	&CMD_VOUT_READ,
+	&CMD_VOUT_WRITE,
+	&CMD_IIN_READ,
+	&CMD_IOUT_READ,
+	&CMD_IOUT_WRITE,
+	&CMD_MOT_READ,
+	&CMD_MOT_WRITE,
 	NULL};
 
 int main(int argc, char *argv[])
