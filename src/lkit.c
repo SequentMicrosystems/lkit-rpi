@@ -463,14 +463,14 @@ int doVoutRead(int argc, char *argv[])
 
 int doVoutWrite(int argc, char *argv[]);
 const CliCmdType CMD_VOUT_WRITE =
-{
-	"voutwr",
-	1,
-	&doVoutWrite,
-	"\tvoutwr		Set the 0-10V output port value\n",
-	"\tUsage:		lkit voutwr <value(V)>\n",
-	"",
-	"\tExample:		lkit voutwr 5.52  Set the voltage on 0-10V output port at 5.52V\n"};
+	{
+		"voutwr",
+		1,
+		&doVoutWrite,
+		"\tvoutwr		Set the 0-10V output port value\n",
+		"\tUsage:		lkit voutwr <value(V)>\n",
+		"",
+		"\tExample:		lkit voutwr 5.52  Set the voltage on 0-10V output port at 5.52V\n"};
 
 int doVoutWrite(int argc, char *argv[])
 {
@@ -485,18 +485,18 @@ int doVoutWrite(int argc, char *argv[])
 	{
 		return ARG_CNT_ERR;
 	}
-	
+
 	dev = doBoardInit();
 	if (dev <= 0)
 	{
 		return FAIL;
 	}
 	value = atof(argv[2]);
-	if(value > 10 || value < 0)
+	if (value > 10 || value < 0)
 	{
 		return ARG_ERR;
 	}
-	aux = (u16)round(value*1000);
+	aux = (u16)round(value * 1000);
 	memcpy(buff, &aux, 2);
 	resp = i2cMem8Write(dev, I2C_MEM_V_OUT_ADD, buff, 2);
 	if (FAIL == resp)
@@ -589,14 +589,14 @@ int doIoutRead(int argc, char *argv[])
 
 int doIoutWrite(int argc, char *argv[]);
 const CliCmdType CMD_IOUT_WRITE =
-{
-	"ioutwr",
-	1,
-	&doIoutWrite,
-	"\tioutwr		Set the 4-20mA output port value\n",
-	"\tUsage:		lkit ioutwr <value(mA)>\n",
-	"",
-	"\tExample:		lkit ioutwr 5.52  Set the current on 4-20mA output port at 5.52mA\n"};
+	{
+		"ioutwr",
+		1,
+		&doIoutWrite,
+		"\tioutwr		Set the 4-20mA output port value\n",
+		"\tUsage:		lkit ioutwr <value(mA)>\n",
+		"",
+		"\tExample:		lkit ioutwr 5.52  Set the current on 4-20mA output port at 5.52mA\n"};
 
 int doIoutWrite(int argc, char *argv[])
 {
@@ -611,18 +611,18 @@ int doIoutWrite(int argc, char *argv[])
 	{
 		return ARG_CNT_ERR;
 	}
-	
+
 	dev = doBoardInit();
 	if (dev <= 0)
 	{
 		return FAIL;
 	}
 	value = atof(argv[2]);
-	if(value > 20 || value < 4)
+	if (value > 20 || value < 4)
 	{
 		return ARG_ERR;
 	}
-	aux = (u16)round(value*1000);
+	aux = (u16)round(value * 1000);
 	memcpy(buff, &aux, 2);
 	resp = i2cMem8Write(dev, I2C_MEM_I_OUT_ADD, buff, 2);
 	if (FAIL == resp)
@@ -698,24 +698,94 @@ int doMotWrite(int argc, char *argv[])
 	{
 		return ARG_CNT_ERR;
 	}
-	
+
 	dev = doBoardInit();
 	if (dev <= 0)
 	{
 		return FAIL;
 	}
 	value = atof(argv[2]);
-	if(value > 100 || value < -100)
+	if (value > 100 || value < -100)
 	{
 		return ARG_ERR;
 	}
-	aux = (s16)round(value*10);
+	aux = (s16)round(value * 10);
 	memcpy(buff, &aux, 2);
 	resp = i2cMem8Write(dev, I2C_MEM_MOT_VAL, buff, 2);
 	if (FAIL == resp)
 	{
 		printf("Fail to write!\n");
 		return FAIL;
+	}
+	return OK;
+}
+
+int doLedWrite(int argc, char *argv[]);
+const CliCmdType CMD_LED_WRITE =
+{
+	"ledwr",
+	1,
+	&doLedWrite,
+	"\tledwr		Set the state of general purpose LEDS on the card\n",
+	"\tUsage:		lkit ledwr <led[1..4]> <state(0/1)>\n",
+	"\tUsage:		lkit ledwr <value[0..15]>",
+	"\tExample:		lkit ledwr 1 1  Turn ON the LED #1\n"};
+
+int doLedWrite(int argc, char *argv[])
+{
+	int dev = -1;
+	u8 buff[2];
+	int resp = 0;
+	int led = 0;
+	int state = 0;
+
+	dev = doBoardInit();
+	if (dev <= 0)
+	{
+		return FAIL;
+	}
+	if (argc == 3)
+	{
+		state = atoi(argv[2]);
+		if (state < 0 || state > 15)
+		{
+			return ARG_ERR;
+		}
+
+		buff[0] = 0xff & state;
+		resp = i2cMem8Write(dev, I2C_MEM_LED_VAL_ADD, buff, 1);
+		if (FAIL == resp)
+		{
+			printf("Fail to write!\n");
+			return FAIL;
+		}
+	}
+	else if (argc == 4)
+	{
+		led = atoi(argv[2]);
+		if (led < 1 || led > 4)
+		{
+			return ARG_ERR;
+		}
+		state = atoi(argv[3]);
+		buff[0] = 0xff & led;
+		if (state > 0)
+		{
+			resp = i2cMem8Write(dev, I2C_MEM_LED_SET_ADD, buff, 1);
+		}
+		else
+		{
+			resp = i2cMem8Write(dev, I2C_MEM_LED_CLR_ADD, buff, 1);
+		}
+		if (FAIL == resp)
+		{
+			printf("Fail to write!\n");
+			return FAIL;
+		}
+	}
+	else
+	{
+		return ARG_CNT_ERR;
 	}
 	return OK;
 }
@@ -737,6 +807,7 @@ const CliCmdType *gCmdArray[] =
 	&CMD_IOUT_WRITE,
 	&CMD_MOT_READ,
 	&CMD_MOT_WRITE,
+	&CMD_LED_WRITE,
 	NULL};
 
 int main(int argc, char *argv[])
