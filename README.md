@@ -1,5 +1,5 @@
 # lkit-rpi
-CLI for Sequent Microsystems Learning Kit
+Command Line Interface for Sequent Microsystems Learning Kit card
 
 You need to enable the I2C communication:
 ```bash
