@@ -1,4 +1,4 @@
-# update
+# Firmware install/update
 This is the Learning Kit firmware update tool
 
 ## Usage
