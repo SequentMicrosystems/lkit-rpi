@@ -7,14 +7,8 @@ Open a command prompt and type the following command:
 ```bash
 ~$ git clone https://github.com/SequentMicrosystems/lkit-rpi.git
 ```
-or update it if is already cloned:
 
-```bash
-~$ cd lki-rpi
-~/lkit-rpi$ git pull
-```
-
-### Update the card 
+### Program the lkit microcontroller firmware
 ```bash
 ~$ cd lkit-rpi/update
 ~/lkit-rpi/update$ sudo ./update LKIT.hex
