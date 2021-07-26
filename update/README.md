@@ -3,6 +3,7 @@
 
 ### Download the lkit repository to your Raspberry Pi
 
+Open a command promt and type the following command
 ```bash
 ~$ git clone https://github.com/SequentMicrosystems/lkit-rpi.git
 ```
