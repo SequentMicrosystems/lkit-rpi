@@ -25,7 +25,7 @@ If you downloaded the repository any update can be made with the following comma
 ~/lkit-rpi$ sudo make install
 ```  
 
-### Program the lkit microcontroller firmware
+## Step4: Program the lkit microcontroller firmware
 ```bash
 ~$ cd lkit-rpi/update
 ~/lkit-rpi/update$ sudo ./install LKIT.hex
