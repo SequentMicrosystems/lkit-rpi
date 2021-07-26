@@ -1,11 +1,8 @@
 # Firmware install/update
-This is the Learning Kit firmware update tool
 
-## Usage
 
-### Get the latest firmware
+### Download the lkit repository to your Raspberry Pi
 
-Clone the repository:
 ```bash
 ~$ git clone https://github.com/SequentMicrosystems/lkit-rpi.git
 ```
