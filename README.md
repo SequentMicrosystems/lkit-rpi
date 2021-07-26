@@ -5,7 +5,7 @@ You need to enable the I2C communication:
 ```bash
 ~$ sudo raspi-config
 ```
-## Usage
+## Install the command line system
 
 ```bash
 ~$ sudo apt-get install git
