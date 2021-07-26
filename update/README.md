@@ -11,6 +11,10 @@ Open a command prompt and type the following command:
 ### Program the lkit microcontroller firmware
 ```bash
 ~$ cd lkit-rpi/update
-~/lkit-rpi/update$ sudo ./update LKIT.hex
+~/lkit-rpi/update$ sudo ./install LKIT.hex
 ```
-and follow the instructions
+To complete the process you must cycle the power on the Rapberry Pi then type the following commands:
+```bash
+~$ cd lkit-rpi/update
+~/lkit-rpi/update$ sudo ./install LKIT.hex
+```
