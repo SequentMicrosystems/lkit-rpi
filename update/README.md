@@ -13,7 +13,7 @@ Open a command prompt and type the following command:
 ~$ cd lkit-rpi/update
 ~/lkit-rpi/update$ sudo ./install LKIT.hex
 ```
-To complete the process you must cycle the power on the Rapberry Pi then type the following commands:
+To complete the process you must cycle the power on the Rapberry Pi. After cycling the power open a command prompt and type the following:
 ```bash
 ~$ cd lkit-rpi/update
 ~/lkit-rpi/update$ sudo ./install LKIT.hex
