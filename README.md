@@ -6,7 +6,7 @@ You need to enable the I2C communication:
 ~$ sudo raspi-config
 ```
 ## Install the command line system
-
+Open a command prompt and type the following commands:
 ```bash
 ~$ sudo apt-get install git
 ~$ git clone https://github.com/SequentMicrosystems/lkit-rpi.git
@@ -14,12 +14,8 @@ You need to enable the I2C communication:
 ~/lkit-rpi$ sudo make install
 ```
 
-Now you can access all the functions of the relays board through the command "lkit". Use -h option for help:
-```bash
-~$ lkit -h
-```
 
-If you clone the repository any update can be made with the following commands:
+If you cloned the repository any update can be made with the following commands:
 
 ```bash
 ~$ cd lkit-rpi/  
