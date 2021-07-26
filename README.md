@@ -1,15 +1,18 @@
 # lkit-rpi
-Command Line Interface for Sequent Microsystems Learning Kit card
+System software for Sequent Microsystems Learning Kit card
 
-You need to enable the I2C communication:
+## Step 1: Enable the I2C communication:
 ```bash
 ~$ sudo raspi-config
 ```
-## Install the command line system
-Open a command prompt and type the following commands:
+## Step 2: Download the Learning Kit repository to your Raspberry Pi
 ```bash
 ~$ sudo apt-get install git
 ~$ git clone https://github.com/SequentMicrosystems/lkit-rpi.git
+```
+
+## Step3: Install the command line system
+```bash
 ~$ cd lkit-rpi/
 ~/lkit-rpi$ sudo make install
 ```
