@@ -75,6 +75,10 @@ int GPIORead(int pin)
 	{
 		return -1;
 	}
+	if (0 != GPIODirection(pin, IN))
+	{
+		return (-1);
+	}
 	snprintf(path, VALUE_MAX, "/sys/class/gpio/gpio%d/value", pin);
 	fd = open(path, O_RDONLY);
 	if (-1 == fd)
