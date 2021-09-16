@@ -15,7 +15,7 @@ In your node-red user directory, tipicaly ~/.node-red,
 Run the following command:
 
 ```bash
-~/.node-red$ npm install ~/megaind-rpi/node-red-contrib-sm-lkit
+~/.node-red$ npm install ~/lkit-rpi/node-red-contrib-sm-lkit
 ```
 
 In order to see the node in the palette and use-it you need to restart node-red. If you run node-red as a service:
