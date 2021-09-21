@@ -2,6 +2,7 @@ module.exports = function(RED) {
     "use strict";
     var I2C = require("i2c-bus");
     var GPIO = require("rpi-gpio");
+    var rpio = require("rpio");
     
     const DEFAULT_HW_ADD = 0x05;
     const I2C_MEM_U0_10_OUT_VAL1 = 18;
@@ -23,6 +24,7 @@ module.exports = function(RED) {
     const gRelayPins = new ArrayBuffer(2);
     gRelayPins[0] = 35;//19;
     gRelayPins[1] = 36;//16;
+    
    
     function VInNode(n) {
         RED.nodes.createNode(this, n);
@@ -527,4 +529,32 @@ module.exports = function(RED) {
         });
     }
     RED.nodes.registerType("LKIT LED", LedNode);
+    
+    
+    function ButtonNode(n) {
+        RED.nodes.createNode(this, n);
+        this.buttonState = -1;
+        var node = this;
+        var pin = 37;
+        
+        try {
+          rpio.open(pin, rpio.INPUT, rpio.PULL_UP);
+        
+          var intervalId = setInterval(function(){
+            var val = rpio.read(pin);
+            if( node.buttonState !== -1 && node.buttonState !== val){
+              node.send({  payload:Number(val) });
+            }
+            node.buttonState = val;
+          },100);
+        } catch(err) {
+                this.error(err);
+            }
+            
+        node.on("close", function() {
+            clearInterval(intervalId);
+        });
+    }
+           
+    RED.nodes.registerType("LKIT BUTTON", ButtonNode);
 }
