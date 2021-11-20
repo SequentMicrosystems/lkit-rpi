@@ -464,7 +464,7 @@ module.exports = function(RED) {
             led = parseInt(led);
             //var buffcount = parseInt(node.count);
             if (isNaN(led) ) {
-                this.status({fill:"red",shape:"ring",text:"Relay number  ("+led+") value is missing or incorrect"});
+                this.status({fill:"red",shape:"ring",text:"Led number  ("+led+") value is missing or incorrect"});
                 return;
             } else {
                 this.status({});
@@ -487,22 +487,20 @@ module.exports = function(RED) {
                 if(led > 4){
                   led = 4;
                 }
+                
                 if(led > 0){
-                    if (myPayload == null || myPayload == false || myPayload == 0 || myPayload == 'off') {
-                      node.port.writeByte(hwAdd, I2C_MEM_LED_CLR_ADD, led,  function(err) {
-                        if (err) { node.error(err, msg);
-                        } else {
-                          node.send(msg);
-                        }
-                      });
-                    } else {
-                      node.port.writeByte(hwAdd, I2C_MEM_LED_SET_ADD, led,  function(err) {
-                        if (err) { node.error(err, msg);
-                        } else {
-                          node.send(msg);
-                        }
-                    });
+                    var val =  node.port.readByteSync(hwAdd, I2C_MEM_LED_VAL_ADD);
+                    if (myPayload == null || myPayload == false || myPayload == 0 || myPayload == 'off' || myPayload == '0') {
+                        val &= ~(1 << (led-1));
+                    } else if(myPayload == true || myPayload == 1 || myPayload == 'on' || myPayload == '1'){
+                        val |= (1 << (led - 1));
+                    }else{
+                        this.status({fill:"red",shape:"ring",text:"Led state value is missing or incorrect"});
+                        return;
                     }
+                    node.port.writeByteSync(hwAdd, I2C_MEM_LED_VAL_ADD, val);
+                    node.send(msg);  
+                   
                 } else {
                     var relVal = parseInt(myPayload);
                     if(isNaN(relVal) || relVal > 15 || relVal < 0)
