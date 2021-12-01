@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-sm-lkit",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "bundleDependencies": false,
   "dependencies": {
     "i2c-bus": "^5.2.0",

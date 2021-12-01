@@ -483,10 +483,18 @@
 </script>
 
 <script type="text/html" data-template-name="LKIT LED">
-    
+
     <div class="form-row">
+        <label for="node-input-sel"> Output type </label>
+        <select id="node-input-sel" class="lkit-out-led" placeholder="Type">
+            <option value="0"> Single </option>
+            <option value="1"> Group </option>
+        </select>
+    </div>
+
+    <div class="form-row" id="node-set-led">
         <label for="node-input-led"><i class="fa fa-empire"></i> Led Number</label>
-        <input id="node-input-led" class="lkit-out-led" placeholder="[msg.led]" min=0 max=4 style="width:100px; height:16px;">
+        <input id="node-input-led" class="lkit-out-led" placeholder="[msg.led]" min=1 max=4 style="width:100px; height:16px;">
     </div>
     <div class="form-row">
         <label for="node-input-payload"><i class="fa fa-envelope"></i> Payload</span></label>
@@ -513,10 +521,11 @@
             led: {value:"1"},
             payload: {value:"payload", required:false, validate: RED.validators.typedInput("payloadType")},
             payloadType: {value:"msg"},
+            sel: {value:"0"},
         },
         color:"#7a9da6",
         inputs:1,
-        outputs:1,
+        outputs:0,
         icon: "LED.png",
         align: "right",
         label: function() { return this.name||'LKIT LED'; },
@@ -532,7 +541,7 @@
                 $("#node-input-led").val(1);
             }
             $("#node-input-led").spinner({
-                min:0,
+                min:1,
                 max:4
             }); 
             $("#node-input-payload").typedInput({
@@ -555,6 +564,18 @@
                     $("#node-input-payload").typedInput('value','payload');
                 }
             });
+            var hidestate = function () {
+                if ($("#node-input-sel").val() === "1") {
+                    $("#node-input-led").hide(); 
+                    $("#node-set-led").hide();                
+                }
+                else {
+                    $("#node-input-led").show();
+                    $("#node-set-led").show();                  
+                }
+            };
+            $("#node-input-sel").on("change", function () { hidestate(); });
+            hidestate();
         }
     });
 </script>

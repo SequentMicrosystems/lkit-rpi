@@ -451,6 +451,7 @@ module.exports = function(RED) {
     function LedNode(n) {
         RED.nodes.createNode(this, n);
         this.led = parseInt(n.led);
+        this.sel = n.sel;
         this.payload = n.payload;
         this.payloadType = n.payloadType;
         var node = this;
@@ -459,8 +460,8 @@ module.exports = function(RED) {
         node.on("input", function(msg) {
             var myPayload;
             
-            var led = node.led;
-            if (isNaN(led)) led = msg.led;
+            var led = msg.led; 
+            if (isNaN(led)) led = node.led;
             led = parseInt(led);
             //var buffcount = parseInt(node.count);
             if (isNaN(led) ) {
@@ -479,33 +480,35 @@ module.exports = function(RED) {
                 } else {
                     myPayload = RED.util.evaluateNodeProperty(this.payload, this.payloadType, this,msg);
                 }
-               
-               
-                if(led < 0){
-                  led = 0;
-                }
-                if(led > 4){
-                  led = 4;
-                }
-                
-                if(led > 0){
+                //console.log("Led number " + led);
+                //console.log("Select type " + node.sel);          
+
+                if(node.sel == 0){//single led selection
+                    if( led > 4 || led < 1)
+                    {
+                        this.status({fill:"red",shape:"ring",text:"msg.led value invalid"});
+                        console.log("msg.led value invalid, value: " + led);
+                        return; 
+                    }
                     var val =  node.port.readByteSync(hwAdd, I2C_MEM_LED_VAL_ADD);
-                    if (myPayload == null || myPayload == false || myPayload == 0 || myPayload == 'off' || myPayload == '0') {
+                    if (myPayload == false || myPayload == 0 || myPayload == 'off' || myPayload == '0') {
                         val &= ~(1 << (led-1));
                     } else if(myPayload == true || myPayload == 1 || myPayload == 'on' || myPayload == '1'){
                         val |= (1 << (led - 1));
                     }else{
-                        this.status({fill:"red",shape:"ring",text:"Led state value is missing or incorrect"});
+                        this.status({fill:"red",shape:"ring",text:"msg.payload value invalid for single mode"});
+                        console.log("msg.payload value invalid for single mode, value " + myPayload);
                         return;
                     }
                     node.port.writeByteSync(hwAdd, I2C_MEM_LED_VAL_ADD, val);
                     node.send(msg);  
                    
-                } else {
+                } else { //group selection
                     var relVal = parseInt(myPayload);
                     if(isNaN(relVal) || relVal > 15 || relVal < 0)
                     {
-                        this.status({fill:"red",shape:"ring",text:"Set value for all leds is missing or incorrect"});
+                        this.status({fill:"red",shape:"ring",text:"msg.payload value invalid for group mode"});
+                        console.log("msg.payload value invalid for group mode, value " + myPayload);
                         return;
                     } else {
                         msg.payload = relVal;
