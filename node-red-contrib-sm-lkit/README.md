@@ -67,9 +67,43 @@ You can specify the relay number in the edit dialog box or programaticaly with t
 
 ### LKIT LED
 
-This node provide access to the general purpose LED's on the card.
-Set one led from 4 or all leds if ```led = 0``` with the value received in ```msg.payload```.
-You can specify the led number in the edit dialog box or programaticaly with the input message ```msg.led```.
+Controls LED GP1 - GP4 on the Sequent Microsystems Learning Kit Card.
+There are two modes of operation: *single mode* and *group* mode.  The mode is selected in the node edit
+
+#### Single Mode Operation
+In single mode operation <span style = "color:red;">*msg.payload*</span> controls the state of a single LED.  The LED to be controlled may be defined in the node editor or in <span style = "color:red">*msg.led*</span>.
+
+The <span style = "color:red;">*msg.payload*</span> value may be numeric, string or Boolean.
+
+ * 0, "0","off", false - Set LED off
+ * 1, "1","on", true   - set LED on
+
+All other values will result in an error message.
+
+##### Selecting and LED in Single Mode
+
+The LED to control is selected either in the node editor or by *msg.led*.  If *msg.led* is define it has priority over the selection in the node editor.
+
+The <span style = "color:red">*msg.led*</span> value may be numeric or string.
+
+ * 1, "1" - Select LED GP1
+ * 2, "2" - Select LED GP2
+ * 3, "3" - Select LED GP3
+ * 4, "4" - Select LED GP4
+ 
+
+#### Group Mode Operation
+
+In group mode <span style = "color:red;">*msg.payload*</span> control all four LEDs (GP1 - GP4) as unit.
+
+The <span style = "color:red;">*msg.payload*</span> value may be numeric or string.
+
+*numeric - 0, 1, 2... 15
+*string - "0", "1", "2"... "15"
+
+The value of the <span style = "color:red;">*msg.payload*</span> value is interpred converted in to a binary number and applied to all four LEDs.  GP1 is the least significan bit and GP4 is the most significan bit. For example, and AN *msg.led* balue of 0 or "0" means all LEDs are off and an *msg.led" of 15 or "15" means all LEDs are on.
+
+All other values of *<span style = "color:red;">*msg.payload*</span> in group mode will result in an error message.
 
 ### LKIT BUTTON
 
