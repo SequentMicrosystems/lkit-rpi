@@ -376,7 +376,7 @@ module.exports = function(RED) {
     
     
     function RelayOutNode(n) {
-         RED.nodes.createNode(this, n);
+        RED.nodes.createNode(this, n);
        
         this.relay = parseInt(n.relay);
         this.payload = n.payload;
@@ -534,20 +534,27 @@ module.exports = function(RED) {
     
     function ButtonNode(n) {
         RED.nodes.createNode(this, n);
+        this.bounce = parseInt(n.bounce);
         this.buttonState = -1;
         var node = this;
         var pin = 37;
         
+        if(node.bounce < 10){
+            node.bounce = 10;
+        }
+        if(node.bounce > 4000){
+            node.bounce = 4000;
+        }
         try {
           rpio.open(pin, rpio.INPUT, rpio.PULL_UP);
         
           var intervalId = setInterval(function(){
             var val = rpio.read(pin);
             if( node.buttonState !== -1 && node.buttonState !== val){
-              node.send({  payload:Number(val) });
+              node.send({ payload:Number(1 ^ val) });
             }
             node.buttonState = val;
-          },100);
+          },node.bounce);
         } catch(err) {
                 this.error(err);
             }

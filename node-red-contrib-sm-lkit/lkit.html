@@ -509,40 +509,38 @@
  
 <script type="text/html" data-help-name="LKIT LED">
     <div class="tip" markdown="1">
-    <span style="display:block" class="note">
-<p>Controls LED GP1 - GP4 on the Sequent Microsystems Learning Kit Card.</p>
-<p>There are two modes of operation: <em>single mode</em>> and <em>group</em> mode.  The mode is selected in the node edit</p>
-<h2>Single Mode Operation</h2>
-<p>In single mode operation <span style = "color:red;"><em>msg.payload</em></span> controls the state of a single LED.  The LED to be controlled may be defined in the node editor or in <span style = "color:red">*msg.led*</span>.</p>
-<p>The <span style = "color:red;"><em>msg.payload</em></span> value may be numeric, string or Boolean.</p>
-<ul>
-<li> 0, "0","off", false - Set LED off</li>
-<li> 1, "1","on", true   - set LED on</li>
-</ul>
-<p> All other values will result in an error message.</p>
+        <span style="display:block" class="note">
+            <p>Controls LED GP1 - GP4 on the Sequent Microsystems Learning Kit Card.</p>
+            <p>There are two modes of operation: <em>single mode</em>> and <em>group</em> mode.  The mode is selected in the node edit</p>
+            <h2>Single Mode Operation</h2>
+            <p>In single mode operation <span style = "color:red;"><em>msg.payload</em></span> controls the state of a single LED.  The LED to be controlled may be defined in the node editor or in <span style = "color:red">*msg.led*</span>.</p>
+            <p>The <span style = "color:red;"><em>msg.payload</em></span> value may be numeric, string or Boolean.</p>
+            <ul>
+                <li> 0, "0","off", false - Set LED off</li>
+                <li> 1, "1","on", true   - set LED on</li>
+            </ul>
+            <p> All other values will result in an error message.</p>
 
-<h3>Selecting and LED in Single Mode</h3>
+            <h3>Selecting and LED in Single Mode</h3>
+            <p>The LED to control is selected either in the node editor or by <em>msg.led</em>.  If <em>msg.led</em> is define it has priority over the selection in the node editor.</p>
+            <p>The <span style = "color:red"><em>msg.led</em></span> value may be numeric or string.</p>
+            <ul>
+                <li> 1, "1" - Select LED GP1</li>
+                <li> 2, "2" - Select LED GP2</li>
+                <li> 3, "3" - Select LED GP3</li>
+                <li> 4, "4" - Select LED GP4</li>
+            </ul>
 
-<p>The LED to control is selected either in the node editor or by <em>msg.led</em>.  If <em>msg.led</em> is define it has priority over the selection in the node editor.</p>
-<p>The <span style = "color:red"><em>msg.led</em></span> value may be numeric or string.</p>
-<ul>
- <li> 1, "1" - Select LED GP1</li>
- <li> 2, "2" - Select LED GP2</li>
- <li> 3, "3" - Select LED GP3</li>
- <li> 4, "4" - Select LED GP4</li>
-</ul>
-
-<h2> Group Mode Operation</h2>
-
-<p></p>In group mode <span style = "color:red;"><em>msg.payload</em></span> control all four LEDs (GP1 - GP4) as unit.</p>
-<p>The <span style = "color:red;"><em>msg.payload</em></span> value may be numeric or string.</p>
-<ul>
-<li>numeric - 0, 1, 2... 15</li>
-<li>string - "0", "1", "2"... "15"</li>
-</ul>
-<p>The value of the <span style = "color:red;"><em>msg.payload</em></span> value is interpred converted in to a binary number and applied to all four LEDs.  GP1 is the least significan bit and GP4 is the most significan bit. For example, and AN *msg.led* balue of 0 or "0" means all LEDs are off and an *msg.led" of 15 or "15" means all LEDs are on.</p>
-<p>All other values of <span style = "color:red;"><em>msg.payload</em></span> in group mode will result in an error message.</p>
-</span>
+            <h2> Group Mode Operation</h2>
+            <p></p>In group mode <span style = "color:red;"><em>msg.payload</em></span> control all four LEDs (GP1 - GP4) as unit.</p>
+            <p>The <span style = "color:red;"><em>msg.payload</em></span> value may be numeric or string.</p>
+            <ul>
+                <li>numeric - 0, 1, 2... 15</li>
+                <li>string - "0", "1", "2"... "15"</li>
+            </ul>
+            <p>The value of the <span style = "color:red;"><em>msg.payload</em></span> value is interpred converted in to a binary number and applied to all four LEDs.  GP1 is the least significan bit and GP4 is the most significan bit. For example, and AN *msg.led* balue of 0 or "0" means all LEDs are off and an *msg.led" of 15 or "15" means all LEDs are on.</p>
+            <p>All other values of <span style = "color:red;"><em>msg.payload</em></span> in group mode will result in an error message.</p>
+        </span>
     </div>
 </script>
 
@@ -614,6 +612,10 @@
 </script>
 
 <script type="text/html" data-template-name="LKIT BUTTON">  
+    <div class="form-row" id="node-set-bounce">
+        <label for="node-input-bounce"><i class="fa fa-empire"></i> Debouncing</label>
+        <input id="node-input-bounce" class="lkit-out-bounce" placeholder="Debouncing" min=10 max=4000 style="width:40px; height:16px;">&nbsp;mS
+    </div>
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -628,9 +630,8 @@
     RED.nodes.registerType('LKIT BUTTON', {
         category: 'Sequent Microsystems',
         defaults: {
+            bounce: {value:"25"},
             name: {value:""},
-            payload: {value:"payload", required:false, validate: RED.validators.typedInput("payloadType")},
-            payloadType: {value:"msg"},
         },
         color:"#7a9da6",
         inputs:0,
@@ -640,31 +641,13 @@
         label: function() { return this.name||'LKIT BUTTON'; },
         labelStyle: function() { return this.name?"node_label_italic":"";},
         oneditprepare: function() {
-            if (this.payloadType == null) {
-                this.payloadType = "msg";
-            } else if (this.payloadType === 'string' ) {
-                this.payloadType = "str";
+            if (this.bounce === undefined) {
+                $("#node-input-bounce").val(25);
             }
-            $("#node-input-payload").typedInput({
-                default: 'msg',
-                typeField: $("#node-input-payloadType"),
-                types:['msg','flow','global','str','num','bool','json','bin']
-            });
-            $("#node-input-payload").typedInput('type',this.payloadType);
-            $("#node-input-payloadType").val(this.payloadType);
-            if ($("#node-input-payload").typedInput('type') === 'msg' &&
-                $("#node-input-payload").typedInput('value') === ''
-            ) {
-                $("#node-input-payload").typedInput('value','payload');
-            }
-			
-            $("#node-input-payload").on('change',function() {
-                if ($("#node-input-payload").typedInput('type') === 'msg' &&
-                    $("#node-input-payload").typedInput('value') === ''
-                ) {
-                    $("#node-input-payload").typedInput('value','payload');
-                }
-            });
+            $("#node-input-bounce").spinner({
+                min:10,
+                max:4000
+            }); 
         }
     });
 </script>
