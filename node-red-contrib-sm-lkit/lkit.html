@@ -330,10 +330,21 @@
     });
 </script>
 
-<script type="text/html" data-template-name="LKIT OPT in">
+<script type="text/html" data-template-name="LKIT OPTO in">
+    <div class="form-row">
+        <label for="node-input-fetch"><i class="fa fa-hourglass-half"></i>Type</label>
+        <select type="text" id="node-input-fetch" style="width:130px;">
+            <option value="in">Input</option>
+            <option value="read">Read</option>
+        </select>
+        <span id="node-repeatTime">
+            <span style="margin-left:20px;"> Debouncing</span>
+            <input  id="node-input-repeat" class="lkit-input-repeat"  min=10 max=4000 style="width:40px; height:16px;">&nbsp;mS
+        </span>  
+    </div>
     <div class="form-row">
         <label for="node-input-channel"><i class="fa fa-empire"></i> Optocoupled input channel</label>
-        <input id="node-input-channel" class="lkit-out-channel" placeholder="[msg.channel]" min=1 max=4 style="width:100px; height:16px;">
+        <input id="node-input-channel" class="lkit-input-channel" placeholder="[msg.channel]" min=1 max=4 style="width:100px; height:16px;">
     </div> 
     <div class="form-row">
         <label for="node-input-payload"><i class="fa fa-envelope"></i> Payload</span></label>
@@ -346,27 +357,53 @@
     </div>
 </script>
  
-<script type="text/html" data-help-name="LKIT OPT in">
+<script type="text/html" data-help-name="LKIT OPTO in">
     <p>Provides a connection to an Sequent Microsystems Learning Kit Card Optocoupled Inputs.</p>
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType('LKIT OPT in', {
+    RED.nodes.registerType('LKIT OPTO in', {
         category: 'Sequent Microsystems',
         defaults: {
+            repeat:{value: "25"},
             name: {value:""},
             channel: {value:"1"},
             payload: {value:"payload", required:false, validate: RED.validators.typedInput("payloadType")},
             payloadType: {value:"msg"},
+            fetch: {value:"in"},
+            inputs: {value:0}
         },
         color:"#7a9da6",
-        inputs:1,
+        inputs:0,
         outputs:1,
         icon: "optocoupler.png",
         align: "left",
-        label: function() { return this.name||'LKIT OPT in'; },
+        label: function() { return this.name||'LKIT OPTO in'; },
         labelStyle: function() { return this.name?"node_label_italic":"";},
         oneditprepare: function() {
+            var that = this;
+            if ($("#node-input-fetch").val() === null) { $("#node-input-fetch").val("in"); }
+            $("#node-input-fetch").change(function() {
+                if ($("#node-input-fetch").val() === "read") {
+                    $('#node-repeatTime').hide();
+                    that.inputs = 1;
+                   
+                }
+                else  {
+                    $('#node-repeatTime').show();
+                    that.inputs = 0;
+                    // if( this.channel === undefined){
+                    //     $("#node-input-channel").val(1);
+                    // }
+                }
+            });
+            if (this.repeat === undefined) {
+                $("#node-input-repeat").val(25);
+            }
+            $("#node-input-repeat").spinner({
+                min:10,
+                max:4000
+            }); 
             if (this.payloadType == null) {
                 this.payloadType = "msg";
             } else if (this.payloadType === 'string' ) {
@@ -379,7 +416,6 @@
                 min:1,
                 max:4
             }); 
-           
             $("#node-input-payload").typedInput({
                 default: 'msg',
                 typeField: $("#node-input-payloadType"),
@@ -439,7 +475,7 @@
         },
         color:"#7a9da6",
         inputs:1,
-        outputs:1,
+        outputs:0,
         icon: "relay.png",
         align: "right",
         label: function() { return this.name||'LKIT RELAY'; },
