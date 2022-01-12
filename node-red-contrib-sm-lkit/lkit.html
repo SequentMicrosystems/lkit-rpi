@@ -433,24 +433,24 @@
         voltage to the input as this may damage the card or the Raspberry Pi.
       </p>
       <p>
-        There are two modes of operation _input_ and _read_. The mode is
-        selected in the node editor by the _mode_ dropdown menu.
+        There are two modes of operation <i>input</i> and <i>read</i>. The mode is
+        selected in the node editor by the <i>mode</i> dropdown menu.
       </p>
       <p>
         In either mode of operation the output port provides one of two values:
-        boolean _true_ or boolean _false_. A value of _true_ indicates that the
-        identified input port is connected to ground, whereas a value of _false_
-        indicates that the input port is _open_.
+        boolean <i>true</i> or boolean <i>false</i>. A value of <i>true</i> indicates that the
+        identified input port is connected to ground, whereas a value of <i>false</i>
+        indicates that the input port is <i>open</i>.
       </p>
       <h2>Input Mode Operation</h2>
       <p>
-        When used in _input_ mode the node shows only one port, the output port.
-        The node monitors the input designated in the _input channel_ dropdown
-        menu. Whenever the selected _input channel_ changes a new output will be
+        When used in <i>input</i> mode the node shows only one port, the output port.
+        The node monitors the input designated in the <i>input channel</i> dropdown
+        menu. Whenever the selected <i>input channel</i> changes a new output will be
         produced indicating the new state of the channel (grouneded or open).
       </p>
       <p>
-        In _input_ mode <b>no</b> output is produced upon intial deployment of the
+        In <i>input</i> mode <b>no</b> output is produced upon intial deployment of the
         node.
       </p>
       <h2>Read Mode Operation</h2>
@@ -461,11 +461,11 @@
         and the output is triggerd only by the reception of the message.
       </p>
       <p>
-        The _input channel_ to be read may be designated either in the input
+        The <i>input channel</i> to be read may be designated either in the input
         channel dropdown menu or by the
         <span style="color:red"><i>msg.channel</i></span> value of the input message.
         To use the <span style="color:red"><i>msg.channel</i></span> value
-        delete the channel number from the _input channel_ dropdown.
+        delete the channel number from the <i>input channel</i> dropdown.
       </p>
       <p>
         The only valid value for
@@ -474,9 +474,9 @@
         error message and no output will be produced.
       </p>
       <p>
-        <b>Debouncing</b>: the value of the _input channel_ is determined by
+        <b>Debouncing</b>: the value of the <i>input channel</i> is determined by
         reading the signal at a short intervals (default of 25 msec) until two
-        reads produce the same value. This becomes the output value. In _input_
+        reads produce the same value. This becomes the output value. In <i>input</i>
         mode an output is only produced if two successive reads differ from the
         current store value.
       </p>
