@@ -4,7 +4,7 @@ This is the node-red node to control Sequent Microsystems Learning Kit Card
 
 ## Manual Install
 
-Clone or update the repository, follow the instrutions fron the [first page.](https://github.com/SequentMicrosystems/lkit-rpi)
+Clone or update the repository, following the instrutions from the [first page.](https://github.com/SequentMicrosystems/lkit-rpi)
 
 In your node-red user directory, tipicaly ~/.node-red,
 
