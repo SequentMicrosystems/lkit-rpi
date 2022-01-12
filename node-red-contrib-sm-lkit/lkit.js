@@ -430,12 +430,14 @@ module.exports = function (RED) {
         } else {
           this.status({});
         }
-
-        if (channel < 1) {
-          channel = 1;
-        }
-        if (channel > 4) {
-          channel = 4;
+        if (channel > 4 || channel < 1) {
+          this.status({
+            fill: "red",
+            shape: "ring",
+            text: "invalid [msg.channel] value",
+          });
+          console.log("msg.channel value invalid, value: " + channel);
+          return;
         }
         try {
           if (this.payloadType == null) {

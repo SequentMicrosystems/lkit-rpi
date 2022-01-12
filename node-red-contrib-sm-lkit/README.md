@@ -55,9 +55,18 @@ You can control the torque and the direction of rotation setting ```msg.payload`
 
 ### LKIT OPT in
 
-This node reads the optically coupled input state for one particular channel.
-The optically coupled input channel number can be set in the node dialog box or dynamically through ```msg.channel```.
-The read is triggered by the message input and output can be found in the output message payload as boolean.
+When used in _input_ mode the node shows only one port, the output port.  The node monitors the input designated in the _input channel_ dropdown menu. Whenever the selected _input channel_ changes a new output will be produced indicating the new state of the channel (grouneded or open).
+
+In _input_ mode **no** output is produced upon intial deployment of the node.
+
+#### Read Mode Operation
+In read mode both an input and output port are shown. An output message is generated whenever a message is received at the input port.  The contents of the <span style = "color:red">*msg.payload*</span> are ignored and the output is triggerd only by the reception of the message.
+
+The _input channel_ to be read may be designated either in the input channel dropdown menu or by the <span style = "color:red">*msg.channel*</span> value of the input message.  To use the <span style = "color:red">*msg.channel*</span> value delete the channel number from the _input channel_ dropdown.
+
+The only valid value for <span style = "color:red">*msg.channel*</span> are numeric 1, 2, 3, 4 and strings "1","2", "3", and "4".  All other values will produce an error message and no output will be produced.
+
+**Debouncing**: the value of the _input channel_ is determined by reading the signal at a short intervals (default of 25 msec) until two reads produce the same value. This becomes the output value. In _input_ mode an output is only produced if two successive reads differ from the current store value.
 
 ### LKIT RELAY
 

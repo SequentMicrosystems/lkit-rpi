@@ -1,689 +1,863 @@
 <script type="text/html" data-template-name="LKIT 0-10V in">
-    <div class="form-row">
-        <label for="node-input-payload"><i class="fa fa-envelope"></i> Payload</span></label>
-        <input type="text" id="node-input-payload" style="width:70%">
-        <input type="hidden" id="node-input-payloadType">
-    </div>
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
+  <div class="form-row">
+      <label for="node-input-payload"><i class="fa fa-envelope"></i> Payload</span></label>
+      <input type="text" id="node-input-payload" style="width:70%">
+      <input type="hidden" id="node-input-payloadType">
+  </div>
+  <div class="form-row">
+      <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+      <input type="text" id="node-input-name" placeholder="Name">
+  </div>
 </script>
- 
+
 <script type="text/html" data-help-name="LKIT 0-10V in">
-    <p>Provides a connection to an Sequent Microsystems Learning Kit Card 0-10V input </p>
+  <p>
+    Provides a connection to an Sequent Microsystems Learning Kit Card 0-10V
+    input
+  </p>
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType('LKIT 0-10V in', {
-        category: 'Sequent Microsystems',
-        defaults: {
-            name: {value:""},
-            payload: {value:"payload", required:false, validate: RED.validators.typedInput("payloadType")},
-            payloadType: {value:"msg"},
-        },
-        color:"#7a9da6",
-        inputs:1,
-        outputs:1,
-        icon: "adc.png",
-        align: "left",
-        label: function() { return this.name||'lkit 0-10V in'; },
-        labelStyle: function() { return this.name?"node_label_italic":"";},
-        oneditprepare: function() {
-            if (this.payloadType == null) {
-                this.payloadType = "msg";
-            } else if (this.payloadType === 'string' ) {
-                this.payloadType = "str";
-            }
-            $("#node-input-payload").typedInput({
-                default: 'msg',
-                typeField: $("#node-input-payloadType"),
-                types:['msg','flow','global','str','num','bool','json','bin']
-            });
-            $("#node-input-payload").typedInput('type',this.payloadType);
-            $("#node-input-payloadType").val(this.payloadType);
-            if ($("#node-input-payload").typedInput('type') === 'msg' &&
-                $("#node-input-payload").typedInput('value') === ''
-            ) {
-                $("#node-input-payload").typedInput('value','payload');
-            }
-			
-            $("#node-input-payload").on('change',function() {
-                if ($("#node-input-payload").typedInput('type') === 'msg' &&
-                    $("#node-input-payload").typedInput('value') === ''
-                ) {
-                    $("#node-input-payload").typedInput('value','payload');
-                }
-            });
-        }
-    });
-</script>
+  RED.nodes.registerType("LKIT 0-10V in", {
+    category: "Sequent Microsystems",
+    defaults: {
+      name: { value: "" },
+      payload: {
+        value: "payload",
+        required: false,
+        validate: RED.validators.typedInput("payloadType"),
+      },
+      payloadType: { value: "msg" },
+    },
+    color: "#7a9da6",
+    inputs: 1,
+    outputs: 1,
+    icon: "adc.png",
+    align: "left",
+    label: function () {
+      return this.name || "lkit 0-10V in";
+    },
+    labelStyle: function () {
+      return this.name ? "node_label_italic" : "";
+    },
+    oneditprepare: function () {
+      if (this.payloadType == null) {
+        this.payloadType = "msg";
+      } else if (this.payloadType === "string") {
+        this.payloadType = "str";
+      }
+      $("#node-input-payload").typedInput({
+        default: "msg",
+        typeField: $("#node-input-payloadType"),
+        types: ["msg", "flow", "global", "str", "num", "bool", "json", "bin"],
+      });
+      $("#node-input-payload").typedInput("type", this.payloadType);
+      $("#node-input-payloadType").val(this.payloadType);
+      if (
+        $("#node-input-payload").typedInput("type") === "msg" &&
+        $("#node-input-payload").typedInput("value") === ""
+      ) {
+        $("#node-input-payload").typedInput("value", "payload");
+      }
 
+      $("#node-input-payload").on("change", function () {
+        if (
+          $("#node-input-payload").typedInput("type") === "msg" &&
+          $("#node-input-payload").typedInput("value") === ""
+        ) {
+          $("#node-input-payload").typedInput("value", "payload");
+        }
+      });
+    },
+  });
+</script>
 
 <script type="text/html" data-template-name="LKIT D10V in">
-       <div class="form-row">
-        <label for="node-input-stack"><i class="fa fa-address-card-o""></i> Board Stack Level</label>
-        <input id="node-input-stack" class="lkit-out-stack" placeholder="[msg.stack]" min=0 max=7 style="width:100px; height:16px;">
-    </div>
-    
-    <div class="form-row">
-        <label for="node-input-channel"><i class="fa fa-empire"></i> +/-10V input channel</label>
-        <input id="node-input-channel" class="lkit-out-channel" placeholder="[msg.channel]" min=1 max=8 style="width:100px; height:16px;">
-    </div>
-    <div class="form-row">
-        <label for="node-input-payload"><i class="fa fa-envelope"></i> Payload</span></label>
-        <input type="text" id="node-input-payload" style="width:70%">
-        <input type="hidden" id="node-input-payloadType">
-    </div>
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
+     <div class="form-row">
+      <label for="node-input-stack"><i class="fa fa-address-card-o""></i> Board Stack Level</label>
+      <input id="node-input-stack" class="lkit-out-stack" placeholder="[msg.stack]" min=0 max=7 style="width:100px; height:16px;">
+  </div>
+
+  <div class="form-row">
+      <label for="node-input-channel"><i class="fa fa-empire"></i> +/-10V input channel</label>
+      <input id="node-input-channel" class="lkit-out-channel" placeholder="[msg.channel]" min=1 max=8 style="width:100px; height:16px;">
+  </div>
+  <div class="form-row">
+      <label for="node-input-payload"><i class="fa fa-envelope"></i> Payload</span></label>
+      <input type="text" id="node-input-payload" style="width:70%">
+      <input type="hidden" id="node-input-payloadType">
+  </div>
+  <div class="form-row">
+      <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+      <input type="text" id="node-input-name" placeholder="Name">
+  </div>
 </script>
- 
 
 <script type="text/html" data-template-name="LKIT 0-10V out">
-    <div class="form-row">
-        <label for="node-input-payload"><i class="fa fa-envelope"></i> Payload</span></label>
-        <input type="text" id="node-input-payload" style="width:70%">
-        <input type="hidden" id="node-input-payloadType">
-    </div>
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
+  <div class="form-row">
+      <label for="node-input-payload"><i class="fa fa-envelope"></i> Payload</span></label>
+      <input type="text" id="node-input-payload" style="width:70%">
+      <input type="hidden" id="node-input-payloadType">
+  </div>
+  <div class="form-row">
+      <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+      <input type="text" id="node-input-name" placeholder="Name">
+  </div>
 </script>
- 
+
 <script type="text/html" data-help-name="LKIT 0-10V out">
-    <p>Provides a connection to an Sequent Microsystems Learning Kit Card 0-10V output </p>
+  <p>
+    Provides a connection to an Sequent Microsystems Learning Kit Card 0-10V
+    output
+  </p>
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType('LKIT 0-10V out', {
-        category: 'Sequent Microsystems',
-        defaults: {
-            name: {value:""},
-            payload: {value:"payload", required:false, validate: RED.validators.typedInput("payloadType")},
-            payloadType: {value:"msg"},
-        },
-        color:"#7a9da6",
-        inputs:1,
-        outputs:1,
-        icon: "dac.png",
-        align: "right",
-        label: function() { return this.name||'lkit 0-10V out'; },
-        labelStyle: function() { return this.name?"node_label_italic":"";},
-        oneditprepare: function() {
-            if (this.payloadType == null) {
-                this.payloadType = "msg";
-            } else if (this.payloadType === 'string' ) {
-                this.payloadType = "str";
-            }
-            $("#node-input-payload").typedInput({
-                default: 'msg',
-                typeField: $("#node-input-payloadType"),
-                types:['msg','flow','global','str','num','bool','json','bin']
-            });
-            $("#node-input-payload").typedInput('type',this.payloadType);
-            $("#node-input-payloadType").val(this.payloadType);
-            if ($("#node-input-payload").typedInput('type') === 'msg' &&
-                $("#node-input-payload").typedInput('value') === ''
-            ) {
-                $("#node-input-payload").typedInput('value','payload');
-            }
-			
-            $("#node-input-payload").on('change',function() {
-                if ($("#node-input-payload").typedInput('type') === 'msg' &&
-                    $("#node-input-payload").typedInput('value') === ''
-                ) {
-                    $("#node-input-payload").typedInput('value','payload');
-                }
-            });
+  RED.nodes.registerType("LKIT 0-10V out", {
+    category: "Sequent Microsystems",
+    defaults: {
+      name: { value: "" },
+      payload: {
+        value: "payload",
+        required: false,
+        validate: RED.validators.typedInput("payloadType"),
+      },
+      payloadType: { value: "msg" },
+    },
+    color: "#7a9da6",
+    inputs: 1,
+    outputs: 1,
+    icon: "dac.png",
+    align: "right",
+    label: function () {
+      return this.name || "lkit 0-10V out";
+    },
+    labelStyle: function () {
+      return this.name ? "node_label_italic" : "";
+    },
+    oneditprepare: function () {
+      if (this.payloadType == null) {
+        this.payloadType = "msg";
+      } else if (this.payloadType === "string") {
+        this.payloadType = "str";
+      }
+      $("#node-input-payload").typedInput({
+        default: "msg",
+        typeField: $("#node-input-payloadType"),
+        types: ["msg", "flow", "global", "str", "num", "bool", "json", "bin"],
+      });
+      $("#node-input-payload").typedInput("type", this.payloadType);
+      $("#node-input-payloadType").val(this.payloadType);
+      if (
+        $("#node-input-payload").typedInput("type") === "msg" &&
+        $("#node-input-payload").typedInput("value") === ""
+      ) {
+        $("#node-input-payload").typedInput("value", "payload");
+      }
+
+      $("#node-input-payload").on("change", function () {
+        if (
+          $("#node-input-payload").typedInput("type") === "msg" &&
+          $("#node-input-payload").typedInput("value") === ""
+        ) {
+          $("#node-input-payload").typedInput("value", "payload");
         }
-    });
+      });
+    },
+  });
 </script>
 
 <!-- Current channels **************************************************************************************************************** -->
-<script type="text/html" data-template-name="LKIT 4-20mA in">      
-    <div class="form-row">
-        <label for="node-input-payload"><i class="fa fa-envelope"></i> Payload</span></label>
-        <input type="text" id="node-input-payload" style="width:70%">
-        <input type="hidden" id="node-input-payloadType">
-    </div>
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
+<script type="text/html" data-template-name="LKIT 4-20mA in">
+  <div class="form-row">
+      <label for="node-input-payload"><i class="fa fa-envelope"></i> Payload</span></label>
+      <input type="text" id="node-input-payload" style="width:70%">
+      <input type="hidden" id="node-input-payloadType">
+  </div>
+  <div class="form-row">
+      <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+      <input type="text" id="node-input-name" placeholder="Name">
+  </div>
 </script>
- 
+
 <script type="text/html" data-help-name="LKIT 4-20mA in">
-    <p>Provides a connection to an Sequent Microsystems Learning Kit Card 4-20mA input </p>
+  <p>
+    Provides a connection to an Sequent Microsystems Learning Kit Card 4-20mA
+    input
+  </p>
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType('LKIT 4-20mA in', {
-        category: 'Sequent Microsystems',
-        defaults: {
-            name: {value:""},
-            payload: {value:"payload", required:false, validate: RED.validators.typedInput("payloadType")},
-            payloadType: {value:"msg"},
-        },
-        color:"#7a9da6",
-        inputs:1,
-        outputs:1,
-        icon: "adc.png",
-        align: "left",
-        label: function() { return this.name||'lkit 4-20mA in'; },
-        labelStyle: function() { return this.name?"node_label_italic":"";},
-        oneditprepare: function() {
-            if (this.payloadType == null) {
-                this.payloadType = "msg";
-            } else if (this.payloadType === 'string' ) {
-                this.payloadType = "str";
-            }
-            $("#node-input-payload").typedInput({
-                default: 'msg',
-                typeField: $("#node-input-payloadType"),
-                types:['msg','flow','global','str','num','bool','json','bin']
-            });
-            $("#node-input-payload").typedInput('type',this.payloadType);
-            $("#node-input-payloadType").val(this.payloadType);
-            if ($("#node-input-payload").typedInput('type') === 'msg' &&
-                $("#node-input-payload").typedInput('value') === ''
-            ) {
-                $("#node-input-payload").typedInput('value','payload');
-            }
-			
-            $("#node-input-payload").on('change',function() {
-                if ($("#node-input-payload").typedInput('type') === 'msg' &&
-                    $("#node-input-payload").typedInput('value') === ''
-                ) {
-                    $("#node-input-payload").typedInput('value','payload');
-                }
-            });
+  RED.nodes.registerType("LKIT 4-20mA in", {
+    category: "Sequent Microsystems",
+    defaults: {
+      name: { value: "" },
+      payload: {
+        value: "payload",
+        required: false,
+        validate: RED.validators.typedInput("payloadType"),
+      },
+      payloadType: { value: "msg" },
+    },
+    color: "#7a9da6",
+    inputs: 1,
+    outputs: 1,
+    icon: "adc.png",
+    align: "left",
+    label: function () {
+      return this.name || "lkit 4-20mA in";
+    },
+    labelStyle: function () {
+      return this.name ? "node_label_italic" : "";
+    },
+    oneditprepare: function () {
+      if (this.payloadType == null) {
+        this.payloadType = "msg";
+      } else if (this.payloadType === "string") {
+        this.payloadType = "str";
+      }
+      $("#node-input-payload").typedInput({
+        default: "msg",
+        typeField: $("#node-input-payloadType"),
+        types: ["msg", "flow", "global", "str", "num", "bool", "json", "bin"],
+      });
+      $("#node-input-payload").typedInput("type", this.payloadType);
+      $("#node-input-payloadType").val(this.payloadType);
+      if (
+        $("#node-input-payload").typedInput("type") === "msg" &&
+        $("#node-input-payload").typedInput("value") === ""
+      ) {
+        $("#node-input-payload").typedInput("value", "payload");
+      }
+
+      $("#node-input-payload").on("change", function () {
+        if (
+          $("#node-input-payload").typedInput("type") === "msg" &&
+          $("#node-input-payload").typedInput("value") === ""
+        ) {
+          $("#node-input-payload").typedInput("value", "payload");
         }
-    });
+      });
+    },
+  });
 </script>
 
-
-<script type="text/html" data-template-name="LKIT 4-20mA out">      
-    <div class="form-row">
-        <label for="node-input-payload"><i class="fa fa-envelope"></i> Payload</span></label>
-        <input type="text" id="node-input-payload" style="width:70%">
-        <input type="hidden" id="node-input-payloadType">
-    </div>
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
+<script type="text/html" data-template-name="LKIT 4-20mA out">
+  <div class="form-row">
+      <label for="node-input-payload"><i class="fa fa-envelope"></i> Payload</span></label>
+      <input type="text" id="node-input-payload" style="width:70%">
+      <input type="hidden" id="node-input-payloadType">
+  </div>
+  <div class="form-row">
+      <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+      <input type="text" id="node-input-name" placeholder="Name">
+  </div>
 </script>
- 
+
 <script type="text/html" data-help-name="LKIT 4-20mA out">
-    <p>Provides a connection to an Sequent Microsystems Learning Kit Card 4-20mA output </p>
+  <p>
+    Provides a connection to an Sequent Microsystems Learning Kit Card 4-20mA
+    output
+  </p>
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType('LKIT 4-20mA out', {
-        category: 'Sequent Microsystems',
-        defaults: {
-            name: {value:""},
-            payload: {value:"payload", required:false, validate: RED.validators.typedInput("payloadType")},
-            payloadType: {value:"msg"},
-        },
-        color:"#7a9da6",
-        inputs:1,
-        outputs:1,
-        icon: "dac.png",
-        align: "right",
-        label: function() { return this.name||'lkit 4-20mA out'; },
-        labelStyle: function() { return this.name?"node_label_italic":"";},
-        oneditprepare: function() {
-            if (this.payloadType == null) {
-                this.payloadType = "msg";
-            } else if (this.payloadType === 'string' ) {
-                this.payloadType = "str";
-            }
-            $("#node-input-payload").typedInput({
-                default: 'msg',
-                typeField: $("#node-input-payloadType"),
-                types:['msg','flow','global','str','num','bool','json','bin']
-            });
-            $("#node-input-payload").typedInput('type',this.payloadType);
-            $("#node-input-payloadType").val(this.payloadType);
-            if ($("#node-input-payload").typedInput('type') === 'msg' &&
-                $("#node-input-payload").typedInput('value') === ''
-            ) {
-                $("#node-input-payload").typedInput('value','payload');
-            }
-			
-            $("#node-input-payload").on('change',function() {
-                if ($("#node-input-payload").typedInput('type') === 'msg' &&
-                    $("#node-input-payload").typedInput('value') === ''
-                ) {
-                    $("#node-input-payload").typedInput('value','payload');
-                }
-            });
+  RED.nodes.registerType("LKIT 4-20mA out", {
+    category: "Sequent Microsystems",
+    defaults: {
+      name: { value: "" },
+      payload: {
+        value: "payload",
+        required: false,
+        validate: RED.validators.typedInput("payloadType"),
+      },
+      payloadType: { value: "msg" },
+    },
+    color: "#7a9da6",
+    inputs: 1,
+    outputs: 1,
+    icon: "dac.png",
+    align: "right",
+    label: function () {
+      return this.name || "lkit 4-20mA out";
+    },
+    labelStyle: function () {
+      return this.name ? "node_label_italic" : "";
+    },
+    oneditprepare: function () {
+      if (this.payloadType == null) {
+        this.payloadType = "msg";
+      } else if (this.payloadType === "string") {
+        this.payloadType = "str";
+      }
+      $("#node-input-payload").typedInput({
+        default: "msg",
+        typeField: $("#node-input-payloadType"),
+        types: ["msg", "flow", "global", "str", "num", "bool", "json", "bin"],
+      });
+      $("#node-input-payload").typedInput("type", this.payloadType);
+      $("#node-input-payloadType").val(this.payloadType);
+      if (
+        $("#node-input-payload").typedInput("type") === "msg" &&
+        $("#node-input-payload").typedInput("value") === ""
+      ) {
+        $("#node-input-payload").typedInput("value", "payload");
+      }
+
+      $("#node-input-payload").on("change", function () {
+        if (
+          $("#node-input-payload").typedInput("type") === "msg" &&
+          $("#node-input-payload").typedInput("value") === ""
+        ) {
+          $("#node-input-payload").typedInput("value", "payload");
         }
-    });
+      });
+    },
+  });
 </script>
 
- 
 <script type="text/html" data-template-name="LKIT MOT out">
-    <div class="form-row">
-        <label for="node-input-payload"><i class="fa fa-envelope"></i> Payload</span></label>
-        <input type="text" id="node-input-payload" style="width:70%">
-        <input type="hidden" id="node-input-payloadType">
-    </div>
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
+  <div class="form-row">
+      <label for="node-input-payload"><i class="fa fa-envelope"></i> Payload</span></label>
+      <input type="text" id="node-input-payload" style="width:70%">
+      <input type="hidden" id="node-input-payloadType">
+  </div>
+  <div class="form-row">
+      <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+      <input type="text" id="node-input-name" placeholder="Name">
+  </div>
 </script>
- 
+
 <script type="text/html" data-help-name="LKIT MOT out">
-    <p>Provides a connection to an Sequent Microsystems Learning Kit Card DC motor driver.</p> 
-    <p>You can set the PWM duty-cycle from -100% to 100% thru <code>msg.payload</code> controling the notor speed and spin.</p>
+  <p>
+    Provides a connection to an Sequent Microsystems Learning Kit Card DC motor
+    driver.
+  </p>
+  <p>
+    You can set the PWM duty-cycle from -100% to 100% thru
+    <code>msg.payload</code> controling the notor speed and spin.
+  </p>
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType('LKIT MOT out', {
-        category: 'Sequent Microsystems',
-        defaults: {
-            name: {value:""},
-            payload: {value:"payload", required:false, validate: RED.validators.typedInput("payloadType")},
-            payloadType: {value:"msg"},
-        },
-		color:'#7a9da6',
-        inputs:1,
-        outputs:1,
-        icon: "motor.png",
-        align: "right",
-        label: function() { return this.name||'ind MOT out'; },
-        labelStyle: function() { return this.name?"node_label_italic":"";},
-        oneditprepare: function() {
-            if (this.payloadType == null) {
-                this.payloadType = "msg";
-            } else if (this.payloadType === 'string' ) {
-                this.payloadType = "str";
-            }          
-            $("#node-input-payload").typedInput({
-                default: 'msg',
-                typeField: $("#node-input-payloadType"),
-                types:['msg','flow','global','str','num','bool','json','bin']
-            });
-            $("#node-input-payload").typedInput('type',this.payloadType);
-            $("#node-input-payloadType").val(this.payloadType);
-            if ($("#node-input-payload").typedInput('type') === 'msg' &&
-                $("#node-input-payload").typedInput('value') === ''
-            ) {
-                $("#node-input-payload").typedInput('value','payload');
-            }
-			
-            $("#node-input-payload").on('change',function() {
-                if ($("#node-input-payload").typedInput('type') === 'msg' &&
-                    $("#node-input-payload").typedInput('value') === ''
-                ) {
-                    $("#node-input-payload").typedInput('value','payload');
-                }
-            });
+  RED.nodes.registerType("LKIT MOT out", {
+    category: "Sequent Microsystems",
+    defaults: {
+      name: { value: "" },
+      payload: {
+        value: "payload",
+        required: false,
+        validate: RED.validators.typedInput("payloadType"),
+      },
+      payloadType: { value: "msg" },
+    },
+    color: "#7a9da6",
+    inputs: 1,
+    outputs: 1,
+    icon: "motor.png",
+    align: "right",
+    label: function () {
+      return this.name || "ind MOT out";
+    },
+    labelStyle: function () {
+      return this.name ? "node_label_italic" : "";
+    },
+    oneditprepare: function () {
+      if (this.payloadType == null) {
+        this.payloadType = "msg";
+      } else if (this.payloadType === "string") {
+        this.payloadType = "str";
+      }
+      $("#node-input-payload").typedInput({
+        default: "msg",
+        typeField: $("#node-input-payloadType"),
+        types: ["msg", "flow", "global", "str", "num", "bool", "json", "bin"],
+      });
+      $("#node-input-payload").typedInput("type", this.payloadType);
+      $("#node-input-payloadType").val(this.payloadType);
+      if (
+        $("#node-input-payload").typedInput("type") === "msg" &&
+        $("#node-input-payload").typedInput("value") === ""
+      ) {
+        $("#node-input-payload").typedInput("value", "payload");
+      }
+
+      $("#node-input-payload").on("change", function () {
+        if (
+          $("#node-input-payload").typedInput("type") === "msg" &&
+          $("#node-input-payload").typedInput("value") === ""
+        ) {
+          $("#node-input-payload").typedInput("value", "payload");
         }
-    });
+      });
+    },
+  });
 </script>
 
 <script type="text/html" data-template-name="LKIT OPTO in">
-    <div class="form-row">
-        <label for="node-input-fetch"><i class="fa fa-hourglass-half"></i>Type</label>
-        <select type="text" id="node-input-fetch" style="width:130px;">
-            <option value="in">Input</option>
-            <option value="read">Read</option>
-        </select>
-        <span id="node-repeatTime">
-            <span style="margin-left:20px;"> Debouncing</span>
-            <input  id="node-input-repeat" class="lkit-input-repeat"  min=10 max=4000 style="width:40px; height:16px;">&nbsp;mS
-        </span>  
-    </div>
-    <div class="form-row">
-        <label for="node-input-channel"><i class="fa fa-empire"></i> Optocoupled input channel</label>
-        <input id="node-input-channel" class="lkit-input-channel" placeholder="[msg.channel]" min=1 max=4 style="width:100px; height:16px;">
-    </div> 
-    <div class="form-row">
-        <label for="node-input-payload"><i class="fa fa-envelope"></i> Payload</span></label>
-        <input type="text" id="node-input-payload" style="width:70%">
-        <input type="hidden" id="node-input-payloadType">
-    </div>
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
+  <div class="form-row">
+      <label for="node-input-fetch"></i>Mode</label>
+      <select type="text" id="node-input-fetch" style="width:130px;">
+          <option value="in">Input</option>
+          <option value="read">Read</option>
+      </select>
+      <span id="node-repeatTime">
+          <span style="margin-left:20px;"> Debouncing</span>
+          <input  id="node-input-repeat" class="lkit-input-repeat"  min=10 max=4000 style="width:40px; height:16px;">&nbsp;mS
+      </span>
+  </div>
+  <div class="form-row">
+      <label for="node-input-channel">Input channel</label>
+      <input id="node-input-channel" class="lkit-input-channel" placeholder="[msg.channel]" min=1 max=4 style="width:100px; height:16px;">
+  </div>
+  <div class="form-row">
+      <label for="node-input-payload"><i class="fa fa-envelope"></i> Payload</span></label>
+      <input type="text" id="node-input-payload" style="width:70%">
+      <input type="hidden" id="node-input-payloadType">
+  </div>
+  <div class="form-row">
+      <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+      <input type="text" id="node-input-name" placeholder="Name">
+  </div>
 </script>
- 
+
 <script type="text/html" data-help-name="LKIT OPTO in">
-    <p>Provides a connection to an Sequent Microsystems Learning Kit Card Optocoupled Inputs.</p>
+  <div class="tip" markdown="1">
+    <span style="display:block" class="note">
+      <p>
+        The LKIT OPTO node controls inputs IN1 to IN4 of the LKIT Learning card.
+      </p>
+      <p>
+        <b>Important</b>: the input to the Learning Card are only switch
+        closures between the input (e.g. IN1) and ground. Do not apply any
+        voltage to the input as this may damage the card or the Raspberry Pi.
+      </p>
+      <p>
+        There are two modes of operation _input_ and _read_. The mode is
+        selected in the node editor by the _mode_ dropdown menu.
+      </p>
+      <p>
+        In either mode of operation the output port provides one of two values:
+        boolean _true_ or boolean _false_. A value of _true_ indicates that the
+        identified input port is connected to ground, whereas a value of _false_
+        indicates that the input port is _open_.
+      </p>
+      <h2>Input Mode Operation</h2>
+      <p>
+        When used in _input_ mode the node shows only one port, the output port.
+        The node monitors the input designated in the _input channel_ dropdown
+        menu. Whenever the selected _input channel_ changes a new output will be
+        produced indicating the new state of the channel (grouneded or open).
+      </p>
+      <p>
+        In _input_ mode <b>no</b> output is produced upon intial deployment of the
+        node.
+      </p>
+      <h2>Read Mode Operation</h2>
+      <p>
+        In read mode both an input and output port are shown. An output message
+        is generated whenever a message is received at the input port. The
+        contents of the <span style="color:red"><i>msg.payload</i></span> are ignored
+        and the output is triggerd only by the reception of the message.
+      </p>
+      <p>
+        The _input channel_ to be read may be designated either in the input
+        channel dropdown menu or by the
+        <span style="color:red"><i>msg.channel</i></span> value of the input message.
+        To use the <span style="color:red"><i>msg.channel</i></span> value
+        delete the channel number from the _input channel_ dropdown.
+      </p>
+      <p>
+        The only valid value for
+        <span style="color:red"><i>msg.channel</i></span> are numeric 1, 2, 3, 4
+        and strings "1","2", "3", and "4". All other values will produce an
+        error message and no output will be produced.
+      </p>
+      <p>
+        <b>Debouncing</b>: the value of the _input channel_ is determined by
+        reading the signal at a short intervals (default of 25 msec) until two
+        reads produce the same value. This becomes the output value. In _input_
+        mode an output is only produced if two successive reads differ from the
+        current store value.
+      </p>
+    </span>
+  </div>
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType('LKIT OPTO in', {
-        category: 'Sequent Microsystems',
-        defaults: {
-            repeat:{value: "25"},
-            name: {value:""},
-            channel: {value:"1"},
-            payload: {value:"payload", required:false, validate: RED.validators.typedInput("payloadType")},
-            payloadType: {value:"msg"},
-            fetch: {value:"in"},
-            inputs: {value:0}
-        },
-        color:"#7a9da6",
-        inputs:0,
-        outputs:1,
-        icon: "optocoupler.png",
-        align: "left",
-        label: function() { return this.name||'LKIT OPTO in'; },
-        labelStyle: function() { return this.name?"node_label_italic":"";},
-        oneditprepare: function() {
-            var that = this;
-            if ($("#node-input-fetch").val() === null) { $("#node-input-fetch").val("in"); }
-            $("#node-input-fetch").change(function() {
-                if ($("#node-input-fetch").val() === "read") {
-                    $('#node-repeatTime').hide();
-                    that.inputs = 1;
-                   
-                }
-                else  {
-                    $('#node-repeatTime').show();
-                    that.inputs = 0;
-                    // if( this.channel === undefined){
-                    //     $("#node-input-channel").val(1);
-                    // }
-                }
-            });
-            if (this.repeat === undefined) {
-                $("#node-input-repeat").val(25);
-            }
-            $("#node-input-repeat").spinner({
-                min:10,
-                max:4000
-            }); 
-            if (this.payloadType == null) {
-                this.payloadType = "msg";
-            } else if (this.payloadType === 'string' ) {
-                this.payloadType = "str";
-            }
-            if (this.channel === undefined) {
-                $("#node-input-channel").val(1);
-            }
-            $("#node-input-channel").spinner({
-                min:1,
-                max:4
-            }); 
-            $("#node-input-payload").typedInput({
-                default: 'msg',
-                typeField: $("#node-input-payloadType"),
-                types:['msg','flow','global','str','num','bool','json','bin']
-            });
-            $("#node-input-payload").typedInput('type',this.payloadType);
-            $("#node-input-payloadType").val(this.payloadType);
-            if ($("#node-input-payload").typedInput('type') === 'msg' &&
-                $("#node-input-payload").typedInput('value') === ''
-            ) {
-                $("#node-input-payload").typedInput('value','payload');
-            }
-			
-            $("#node-input-payload").on('change',function() {
-                if ($("#node-input-payload").typedInput('type') === 'msg' &&
-                    $("#node-input-payload").typedInput('value') === ''
-                ) {
-                    $("#node-input-payload").typedInput('value','payload');
-                }
-            });
+  RED.nodes.registerType("LKIT OPTO in", {
+    category: "Sequent Microsystems",
+    defaults: {
+      repeat: { value: "25" },
+      name: { value: "" },
+      channel: { value: "1" },
+      payload: {
+        value: "payload",
+        required: false,
+        validate: RED.validators.typedInput("payloadType"),
+      },
+      payloadType: { value: "msg" },
+      fetch: { value: "in" },
+      inputs: { value: 0 },
+    },
+    color: "#7a9da6",
+    inputs: 0,
+    outputs: 1,
+    icon: "optocoupler.png",
+    align: "left",
+    label: function () {
+      return this.name || "LKIT OPTO in";
+    },
+    labelStyle: function () {
+      return this.name ? "node_label_italic" : "";
+    },
+    oneditprepare: function () {
+      var that = this;
+      if ($("#node-input-fetch").val() === null) {
+        $("#node-input-fetch").val("in");
+      }
+      $("#node-input-fetch").change(function () {
+        if ($("#node-input-fetch").val() === "read") {
+          $("#node-repeatTime").hide();
+          that.inputs = 1;
+        } else {
+          $("#node-repeatTime").show();
+          that.inputs = 0;
+          // if( this.channel === undefined){
+          //     $("#node-input-channel").val(1);
+          // }
         }
-    });
+      });
+      if (this.repeat === undefined) {
+        $("#node-input-repeat").val(25);
+      }
+      $("#node-input-repeat").spinner({
+        min: 10,
+        max: 4000,
+      });
+      if (this.payloadType == null) {
+        this.payloadType = "msg";
+      } else if (this.payloadType === "string") {
+        this.payloadType = "str";
+      }
+      if (this.channel === undefined) {
+        $("#node-input-channel").val(1);
+      }
+      $("#node-input-channel").spinner({
+        min: 1,
+        max: 4,
+      });
+      $("#node-input-payload").typedInput({
+        default: "msg",
+        typeField: $("#node-input-payloadType"),
+        types: ["msg", "flow", "global", "str", "num", "bool", "json", "bin"],
+      });
+      $("#node-input-payload").typedInput("type", this.payloadType);
+      $("#node-input-payloadType").val(this.payloadType);
+      if (
+        $("#node-input-payload").typedInput("type") === "msg" &&
+        $("#node-input-payload").typedInput("value") === ""
+      ) {
+        $("#node-input-payload").typedInput("value", "payload");
+      }
+
+      $("#node-input-payload").on("change", function () {
+        if (
+          $("#node-input-payload").typedInput("type") === "msg" &&
+          $("#node-input-payload").typedInput("value") === ""
+        ) {
+          $("#node-input-payload").typedInput("value", "payload");
+        }
+      });
+    },
+  });
 </script>
 
 <script type="text/html" data-template-name="LKIT RELAY">
-    
-    
-    <div class="form-row">
-        <label for="node-input-relay"><i class="fa fa-empire"></i> Relay Number</label>
-        <input id="node-input-relay" class="lkit-out-relay" placeholder="[msg.relay]" min=1 max=2 style="width:100px; height:16px;">
-    </div>
-    <div class="form-row">
-        <label for="node-input-payload"><i class="fa fa-envelope"></i> Payload</span></label>
-        <input type="text" id="node-input-payload" style="width:70%">
-        <input type="hidden" id="node-input-payloadType">
-    </div>
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
+
+
+  <div class="form-row">
+      <label for="node-input-relay"><i class="fa fa-empire"></i> Relay Number</label>
+      <input id="node-input-relay" class="lkit-out-relay" placeholder="[msg.relay]" min=1 max=2 style="width:100px; height:16px;">
+  </div>
+  <div class="form-row">
+      <label for="node-input-payload"><i class="fa fa-envelope"></i> Payload</span></label>
+      <input type="text" id="node-input-payload" style="width:70%">
+      <input type="hidden" id="node-input-payloadType">
+  </div>
+  <div class="form-row">
+      <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+      <input type="text" id="node-input-name" placeholder="Name">
+  </div>
 </script>
- 
+
 <script type="text/html" data-help-name="LKIT RELAY">
-    <p>Provides a connection to an Sequent Microsystems Learning Kit Card relays.</p>
-    <p>Set one relay with the value received in <code>msg.payload</code></p>
-    <p>You can specify the relay number in the edit dialog box or programaticaly with the input message <code>msg.relay</code></p>
+  <p>
+    Provides a connection to an Sequent Microsystems Learning Kit Card relays.
+  </p>
+  <p>Set one relay with the value received in <code>msg.payload</code></p>
+  <p>
+    You can specify the relay number in the edit dialog box or programaticaly
+    with the input message <code>msg.relay</code>
+  </p>
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType('LKIT RELAY', {
-        category: 'Sequent Microsystems',
-        defaults: {
-            name: {value:""},
-            relay: {value:"1"},
-            payload: {value:"payload", required:false, validate: RED.validators.typedInput("payloadType")},
-            payloadType: {value:"msg"},
-        },
-        color:"#7a9da6",
-        inputs:1,
-        outputs:0,
-        icon: "relay.png",
-        align: "right",
-        label: function() { return this.name||'LKIT RELAY'; },
-        labelStyle: function() { return this.name?"node_label_italic":"";},
-        oneditprepare: function() {
-            if (this.payloadType == null) {
-                this.payloadType = "msg";
-            } else if (this.payloadType === 'string' ) {
-                this.payloadType = "str";
-            }
+  RED.nodes.registerType("LKIT RELAY", {
+    category: "Sequent Microsystems",
+    defaults: {
+      name: { value: "" },
+      relay: { value: "1" },
+      payload: {
+        value: "payload",
+        required: false,
+        validate: RED.validators.typedInput("payloadType"),
+      },
+      payloadType: { value: "msg" },
+    },
+    color: "#7a9da6",
+    inputs: 1,
+    outputs: 0,
+    icon: "relay.png",
+    align: "right",
+    label: function () {
+      return this.name || "LKIT RELAY";
+    },
+    labelStyle: function () {
+      return this.name ? "node_label_italic" : "";
+    },
+    oneditprepare: function () {
+      if (this.payloadType == null) {
+        this.payloadType = "msg";
+      } else if (this.payloadType === "string") {
+        this.payloadType = "str";
+      }
 
-            if (this.relay === undefined) {
-                $("#node-input-relay").val(1);
-            }
-            $("#node-input-relay").spinner({
-                min:1,
-                max:2
-            }); 
-            $("#node-input-payload").typedInput({
-                default: 'msg',
-                typeField: $("#node-input-payloadType"),
-                types:['msg','flow','global','str','num','bool','json','bin']
-            });
-            $("#node-input-payload").typedInput('type',this.payloadType);
-            $("#node-input-payloadType").val(this.payloadType);
-            if ($("#node-input-payload").typedInput('type') === 'msg' &&
-                $("#node-input-payload").typedInput('value') === ''
-            ) {
-                $("#node-input-payload").typedInput('value','payload');
-            }
-			
-            $("#node-input-payload").on('change',function() {
-                if ($("#node-input-payload").typedInput('type') === 'msg' &&
-                    $("#node-input-payload").typedInput('value') === ''
-                ) {
-                    $("#node-input-payload").typedInput('value','payload');
-                }
-            });
+      if (this.relay === undefined) {
+        $("#node-input-relay").val(1);
+      }
+      $("#node-input-relay").spinner({
+        min: 1,
+        max: 2,
+      });
+      $("#node-input-payload").typedInput({
+        default: "msg",
+        typeField: $("#node-input-payloadType"),
+        types: ["msg", "flow", "global", "str", "num", "bool", "json", "bin"],
+      });
+      $("#node-input-payload").typedInput("type", this.payloadType);
+      $("#node-input-payloadType").val(this.payloadType);
+      if (
+        $("#node-input-payload").typedInput("type") === "msg" &&
+        $("#node-input-payload").typedInput("value") === ""
+      ) {
+        $("#node-input-payload").typedInput("value", "payload");
+      }
+
+      $("#node-input-payload").on("change", function () {
+        if (
+          $("#node-input-payload").typedInput("type") === "msg" &&
+          $("#node-input-payload").typedInput("value") === ""
+        ) {
+          $("#node-input-payload").typedInput("value", "payload");
         }
-    });
+      });
+    },
+  });
 </script>
 
 <script type="text/html" data-template-name="LKIT LED">
 
-    <div class="form-row">
-        <label for="node-input-sel"> Mode </label>
-        <select id="node-input-sel" class="lkit-out-led" placeholder="Type">
-            <option value="0"> Single </option>
-            <option value="1"> Group </option>
-        </select>
-    </div>
+  <div class="form-row">
+      <label for="node-input-sel"> Mode </label>
+      <select id="node-input-sel" class="lkit-out-led" placeholder="Type">
+          <option value="0"> Single </option>
+          <option value="1"> Group </option>
+      </select>
+  </div>
 
-    <div class="form-row" id="node-set-led">
-        <label for="node-input-led"><i class="fa fa-empire"></i> Led Number</label>
-        <input id="node-input-led" class="lkit-out-led" placeholder="[msg.led]" min=1 max=4 style="width:100px; height:16px;">
-    </div>
-    <div class="form-row">
-        <label for="node-input-payload"><i class="fa fa-envelope"></i> Payload</span></label>
-        <input type="text" id="node-input-payload" style="width:70%">
-        <input type="hidden" id="node-input-payloadType">
-    </div>
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
+  <div class="form-row" id="node-set-led">
+      <label for="node-input-led"><i class="fa fa-empire"></i> Led Number</label>
+      <input id="node-input-led" class="lkit-out-led" placeholder="[msg.led]" min=1 max=4 style="width:100px; height:16px;">
+  </div>
+  <div class="form-row">
+      <label for="node-input-payload"><i class="fa fa-envelope"></i> Payload</span></label>
+      <input type="text" id="node-input-payload" style="width:70%">
+      <input type="hidden" id="node-input-payloadType">
+  </div>
+  <div class="form-row">
+      <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+      <input type="text" id="node-input-name" placeholder="Name">
+  </div>
 </script>
- 
+
 <script type="text/html" data-help-name="LKIT LED">
-    <div class="tip" markdown="1">
-        <span style="display:block" class="note">
-            <p>Controls LED GP1 - GP4 on the Sequent Microsystems Learning Kit Card.</p>
-            <p>There are two modes of operation: <em>single mode</em>> and <em>group</em> mode.  The mode is selected in the node edit</p>
-            <h2>Single Mode Operation</h2>
-            <p>In single mode operation <span style = "color:red;"><em>msg.payload</em></span> controls the state of a single LED.  The LED to be controlled may be defined in the node editor or in <span style = "color:red">*msg.led*</span>.</p>
-            <p>The <span style = "color:red;"><em>msg.payload</em></span> value may be numeric, string or Boolean.</p>
-            <ul>
-                <li> 0, "0","off", false - Set LED off</li>
-                <li> 1, "1","on", true   - set LED on</li>
-            </ul>
-            <p> All other values will result in an error message.</p>
+  <div class="tip" markdown="1">
+      <span style="display:block" class="note">
+          <p>Controls LED GP1 - GP4 on the Sequent Microsystems Learning Kit Card.</p>
+          <p>There are two modes of operation: <em>single mode</em>> and <em>group</em> mode.  The mode is selected in the node edit</p>
+          <h2>Single Mode Operation</h2>
+          <p>In single mode operation <span style = "color:red;"><em>msg.payload</em></span> controls the state of a single LED.  The LED to be controlled may be defined in the node editor or in <span style = "color:red">*msg.led*</span>.</p>
+          <p>The <span style = "color:red;"><em>msg.payload</em></span> value may be numeric, string or Boolean.</p>
+          <ul>
+              <li> 0, "0","off", false - Set LED off</li>
+              <li> 1, "1","on", true   - set LED on</li>
+          </ul>
+          <p> All other values will result in an error message.</p>
 
-            <h3>Selecting and LED in Single Mode</h3>
-            <p>The LED to control is selected either in the node editor or by <em>msg.led</em>.  If <em>msg.led</em> is define it has priority over the selection in the node editor.</p>
-            <p>The <span style = "color:red"><em>msg.led</em></span> value may be numeric or string.</p>
-            <ul>
-                <li> 1, "1" - Select LED GP1</li>
-                <li> 2, "2" - Select LED GP2</li>
-                <li> 3, "3" - Select LED GP3</li>
-                <li> 4, "4" - Select LED GP4</li>
-            </ul>
+          <h3>Selecting and LED in Single Mode</h3>
+          <p>The LED to control is selected either in the node editor or by <em>msg.led</em>.  If <em>msg.led</em> is define it has priority over the selection in the node editor.</p>
+          <p>The <span style = "color:red"><em>msg.led</em></span> value may be numeric or string.</p>
+          <ul>
+              <li> 1, "1" - Select LED GP1</li>
+              <li> 2, "2" - Select LED GP2</li>
+              <li> 3, "3" - Select LED GP3</li>
+              <li> 4, "4" - Select LED GP4</li>
+          </ul>
 
-            <h2> Group Mode Operation</h2>
-            <p></p>In group mode <span style = "color:red;"><em>msg.payload</em></span> control all four LEDs (GP1 - GP4) as unit.</p>
-            <p>The <span style = "color:red;"><em>msg.payload</em></span> value may be numeric or string.</p>
-            <ul>
-                <li>numeric - 0, 1, 2... 15</li>
-                <li>string - "0", "1", "2"... "15"</li>
-            </ul>
-            <p>The value of the <span style = "color:red;"><em>msg.payload</em></span> value is interpred converted in to a binary number and applied to all four LEDs.  GP1 is the least significan bit and GP4 is the most significan bit. For example, and AN *msg.led* balue of 0 or "0" means all LEDs are off and an *msg.led" of 15 or "15" means all LEDs are on.</p>
-            <p>All other values of <span style = "color:red;"><em>msg.payload</em></span> in group mode will result in an error message.</p>
-        </span>
-    </div>
+          <h2> Group Mode Operation</h2>
+          <p></p>In group mode <span style = "color:red;"><em>msg.payload</em></span> control all four LEDs (GP1 - GP4) as unit.</p>
+          <p>The <span style = "color:red;"><em>msg.payload</em></span> value may be numeric or string.</p>
+          <ul>
+              <li>numeric - 0, 1, 2... 15</li>
+              <li>string - "0", "1", "2"... "15"</li>
+          </ul>
+          <p>The value of the <span style = "color:red;"><em>msg.payload</em></span> value is interpred converted in to a binary number and applied to all four LEDs.  GP1 is the least significan bit and GP4 is the most significan bit. For example, and AN *msg.led* balue of 0 or "0" means all LEDs are off and an *msg.led" of 15 or "15" means all LEDs are on.</p>
+          <p>All other values of <span style = "color:red;"><em>msg.payload</em></span> in group mode will result in an error message.</p>
+      </span>
+  </div>
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType('LKIT LED', {
-        category: 'Sequent Microsystems',
-        defaults: {
-            name: {value:""},
-            led: {value:"1"},
-            payload: {value:"payload", required:false, validate: RED.validators.typedInput("payloadType")},
-            payloadType: {value:"msg"},
-            sel: {value:"0"},
-        },
-        color:"#7a9da6",
-        inputs:1,
-        outputs:0,
-        icon: "LED.png",
-        align: "right",
-        label: function() { return this.name||'LKIT LED'; },
-        labelStyle: function() { return this.name?"node_label_italic":"";},
-        oneditprepare: function() {
-            if (this.payloadType == null) {
-                this.payloadType = "msg";
-            } else if (this.payloadType === 'string' ) {
-                this.payloadType = "str";
-            }
+  RED.nodes.registerType("LKIT LED", {
+    category: "Sequent Microsystems",
+    defaults: {
+      name: { value: "" },
+      led: { value: "1" },
+      payload: {
+        value: "payload",
+        required: false,
+        validate: RED.validators.typedInput("payloadType"),
+      },
+      payloadType: { value: "msg" },
+      sel: { value: "0" },
+    },
+    color: "#7a9da6",
+    inputs: 1,
+    outputs: 0,
+    icon: "LED.png",
+    align: "right",
+    label: function () {
+      return this.name || "LKIT LED";
+    },
+    labelStyle: function () {
+      return this.name ? "node_label_italic" : "";
+    },
+    oneditprepare: function () {
+      if (this.payloadType == null) {
+        this.payloadType = "msg";
+      } else if (this.payloadType === "string") {
+        this.payloadType = "str";
+      }
 
-            if (this.led === undefined) {
-                $("#node-input-led").val(1);
-            }
-            $("#node-input-led").spinner({
-                min:1,
-                max:4
-            }); 
-            $("#node-input-payload").typedInput({
-                default: 'msg',
-                typeField: $("#node-input-payloadType"),
-                types:['msg','flow','global','str','num','bool','json','bin']
-            });
-            $("#node-input-payload").typedInput('type',this.payloadType);
-            $("#node-input-payloadType").val(this.payloadType);
-            if ($("#node-input-payload").typedInput('type') === 'msg' &&
-                $("#node-input-payload").typedInput('value') === ''
-            ) {
-                $("#node-input-payload").typedInput('value','payload');
-            }
-			
-            $("#node-input-payload").on('change',function() {
-                if ($("#node-input-payload").typedInput('type') === 'msg' &&
-                    $("#node-input-payload").typedInput('value') === ''
-                ) {
-                    $("#node-input-payload").typedInput('value','payload');
-                }
-            });
-            var hidestate = function () {
-                if ($("#node-input-sel").val() === "1") {
-                    $("#node-input-led").hide(); 
-                    $("#node-set-led").hide();                
-                }
-                else {
-                    $("#node-input-led").show();
-                    $("#node-set-led").show();                  
-                }
-            };
-            $("#node-input-sel").on("change", function () { hidestate(); });
-            hidestate();
+      if (this.led === undefined) {
+        $("#node-input-led").val(1);
+      }
+      $("#node-input-led").spinner({
+        min: 1,
+        max: 4,
+      });
+      $("#node-input-payload").typedInput({
+        default: "msg",
+        typeField: $("#node-input-payloadType"),
+        types: ["msg", "flow", "global", "str", "num", "bool", "json", "bin"],
+      });
+      $("#node-input-payload").typedInput("type", this.payloadType);
+      $("#node-input-payloadType").val(this.payloadType);
+      if (
+        $("#node-input-payload").typedInput("type") === "msg" &&
+        $("#node-input-payload").typedInput("value") === ""
+      ) {
+        $("#node-input-payload").typedInput("value", "payload");
+      }
+
+      $("#node-input-payload").on("change", function () {
+        if (
+          $("#node-input-payload").typedInput("type") === "msg" &&
+          $("#node-input-payload").typedInput("value") === ""
+        ) {
+          $("#node-input-payload").typedInput("value", "payload");
         }
-    });
+      });
+      var hidestate = function () {
+        if ($("#node-input-sel").val() === "1") {
+          $("#node-input-led").hide();
+          $("#node-set-led").hide();
+        } else {
+          $("#node-input-led").show();
+          $("#node-set-led").show();
+        }
+      };
+      $("#node-input-sel").on("change", function () {
+        hidestate();
+      });
+      hidestate();
+    },
+  });
 </script>
 
-<script type="text/html" data-template-name="LKIT BUTTON">  
-    <div class="form-row" id="node-set-bounce">
-        <label for="node-input-bounce"><i class="fa fa-empire"></i> Debouncing</label>
-        <input id="node-input-bounce" class="lkit-out-bounce" placeholder="Debouncing" min=10 max=4000 style="width:40px; height:16px;">&nbsp;mS
-    </div>
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
+<script type="text/html" data-template-name="LKIT BUTTON">
+  <div class="form-row" id="node-set-bounce">
+    <label for="node-input-bounce"
+      ><i class="fa fa-empire"></i> Debouncing</label
+    >
+    <input
+      id="node-input-bounce"
+      class="lkit-out-bounce"
+      placeholder="Debouncing"
+      min="10"
+      max="4000"
+      style="width:40px; height:16px;"
+    />&nbsp;mS
+  </div>
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name" />
+  </div>
 </script>
- 
+
 <script type="text/html" data-help-name="LKIT BUTTON">
-    <p>Provides a connection to an Sequent Microsystems Learning Kit Card button.</p>
+  <p>
+    Provides a connection to an Sequent Microsystems Learning Kit Card button.
+  </p>
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType('LKIT BUTTON', {
-        category: 'Sequent Microsystems',
-        defaults: {
-            bounce: {value:"25"},
-            name: {value:""},
-        },
-        color:"#7a9da6",
-        inputs:0,
-        outputs:1,
-        icon: "switch.png",
-        align: "left",
-        label: function() { return this.name||'LKIT BUTTON'; },
-        labelStyle: function() { return this.name?"node_label_italic":"";},
-        oneditprepare: function() {
-            if (this.bounce === undefined) {
-                $("#node-input-bounce").val(25);
-            }
-            $("#node-input-bounce").spinner({
-                min:10,
-                max:4000
-            }); 
-        }
-    });
+  RED.nodes.registerType("LKIT BUTTON", {
+    category: "Sequent Microsystems",
+    defaults: {
+      bounce: { value: "25" },
+      name: { value: "" },
+    },
+    color: "#7a9da6",
+    inputs: 0,
+    outputs: 1,
+    icon: "switch.png",
+    align: "left",
+    label: function () {
+      return this.name || "LKIT BUTTON";
+    },
+    labelStyle: function () {
+      return this.name ? "node_label_italic" : "";
+    },
+    oneditprepare: function () {
+      if (this.bounce === undefined) {
+        $("#node-input-bounce").val(25);
+      }
+      $("#node-input-bounce").spinner({
+        min: 10,
+        max: 4000,
+      });
+    },
+  });
 </script>
