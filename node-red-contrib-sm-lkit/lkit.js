@@ -638,10 +638,12 @@ module.exports = function (RED) {
             return;
           } else {
             msg.payload = relVal;
+            var ledVal = 0;
+            ledVal = (0x01 & (relVal>>3)) + (0x02 & (relVal >> 1)) + (0x04 & (relVal << 1)) + (0x08 & (relVal << 3));
             node.port.writeByte(
               hwAdd,
               I2C_MEM_LED_VAL_ADD,
-              relVal,
+              ledVal,
               function (err) {
                 if (err) {
                   node.error(err, msg);
