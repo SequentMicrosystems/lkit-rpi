@@ -482,6 +482,69 @@ int doVinRead(int argc, char *argv[])
 	return OK;
 }
 
+
+int doVinCal(int argc, char *argv[]);
+const CliCmdType CMD_VIN_CAL =
+{
+	"vincal",
+	1,
+	&doVinCal,
+	"\tvincal		Calibrate 0-10V input port (Calibration must be done in 2 points closer to the full scale)\n",
+	"\tUsage:		lkit vincal <val>\n",
+	"",
+	"\tExample:		lkit vincal 1.23  Calibrate the 0-10V input port at 1.23V\n"};
+
+int doVinCal(int argc, char *argv[])
+{
+	int dev = -1;
+	float value = 0;
+
+	if (argc != 3)
+	{
+		return ARG_CNT_ERR;
+	}
+
+	dev = doBoardInit();
+	if (dev <= 0)
+	{
+		return FAIL;
+	}
+	value = atof(argv[2]);
+	return calib(dev, value, CALIB_CH_V_IN, 0);
+}
+
+int doVinCalRst(int argc, char *argv[]);
+const CliCmdType CMD_VIN_CAL_RST =
+{
+	"vincalrst",
+	1,
+	&doVinCalRst,
+	"\tvincalrst		Reset the 0-10V input port calibration\n",
+	"\tUsage:		lkit vincalrst \n",
+	"",
+	"\tExample:		lkit vincalrst Reset the 0-10V input port calibration\n"};
+
+int doVinCalRst(int argc, char *argv[])
+{
+	int dev = -1;
+	
+	UNUSED(argv);
+	if (argc != 2)
+	{
+		return ARG_CNT_ERR;
+	}
+
+	dev = doBoardInit();
+	if (dev <= 0)
+	{
+		return FAIL;
+	}
+	
+	return calib(dev, 0, CALIB_CH_V_IN, 1);
+}
+
+
+
 int doVoutRead(int argc, char *argv[]);
 const CliCmdType CMD_VOUT_READ =
 {
@@ -623,7 +686,7 @@ const CliCmdType CMD_IIN_CAL =
 	"iincal",
 	1,
 	&doIinCal,
-	"\tiincal		Calibrate 4-20mA input port\n",
+	"\tiincal		Calibrate 4-20mA input port (Calibration must be done in 2 points closer to the full scale)\n",
 	"\tUsage:		lkit iincal <val>\n",
 	"",
 	"\tExample:		lkit iincal 4.23  Calibrate the 4-20mA input port at 4.23mA\n"};
@@ -1047,6 +1110,8 @@ const CliCmdType *gCmdArray[] =
 	&CMD_RELAY_WRITE,
 	&CMD_OPTO_READ,
 	&CMD_VIN_READ,
+	&CMD_VIN_CAL,
+	&CMD_VIN_CAL_RST,
 	&CMD_VOUT_READ,
 	&CMD_VOUT_WRITE,
 	&CMD_IIN_READ,
