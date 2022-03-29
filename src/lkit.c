@@ -18,7 +18,7 @@
 
 #define VERSION_BASE	(int)1
 #define VERSION_MAJOR	(int)0
-#define VERSION_MINOR	(int)1
+#define VERSION_MINOR	(int)2
 
 #define UNUSED(X) (void)X      /* To avoid gcc/g++ warnings */
 #define IN_CH_NR	4
@@ -27,7 +27,7 @@
 #define SCALE_FACTOR 1000
 
 char *warranty =
-	"	       Copyright (c) 2016-2021 Sequent Microsystems\n"
+	"	       Copyright (c) 2016-2022 Sequent Microsystems\n"
 		"                                                             \n"
 		"		This program is free software; you can redistribute it and/or modify\n"
 		"		it under the terms of the GNU Leser General Public License as published\n"
