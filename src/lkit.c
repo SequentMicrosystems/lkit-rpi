@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <math.h>
+#include <pthread.h>
 
 #include "lkit.h"
 #include "comm.h"
@@ -18,7 +19,7 @@
 
 #define VERSION_BASE	(int)1
 #define VERSION_MAJOR	(int)0
-#define VERSION_MINOR	(int)2
+#define VERSION_MINOR	(int)3
 
 #define UNUSED(X) (void)X      /* To avoid gcc/g++ warnings */
 #define IN_CH_NR	4
@@ -53,12 +54,32 @@ const int gRelayPins[RELAY_NR] =
 	19,
 	16};
 
-typedef struct {
+typedef struct
+{
 	float min;
 	float max;
-}	CalibLimitsStruct;
+} CalibLimitsStruct;
 
-const CalibLimitsStruct calLimits[CALIB_CH_COUNT] = {{0, 0}, {0, 10}, {4, 20}, {4, 20}, {0, 10}, {4, 20}};
+const CalibLimitsStruct calLimits[CALIB_CH_COUNT] =
+{
+	{
+		0,
+		0},
+	{
+		0,
+		10},
+	{
+		4,
+		20},
+	{
+		4,
+		20},
+	{
+		0,
+		10},
+	{
+		4,
+		20}};
 int gServoEnable = 0;
 
 void usage(void)
@@ -87,7 +108,7 @@ int writeU16(int dev, int add, int val)
 	u8 buff[2];
 	u16 v = 0;
 
-	if(add < 0 || add > SLAVE_BUFF_SIZE)
+	if (add < 0 || add > SLAVE_BUFF_SIZE)
 	{
 		return ARG_ERR;
 	}
@@ -103,22 +124,23 @@ int calib(int dev, float val, u8 channel, u8 reset)
 	u8 buff[2];
 	int ret = 0;
 
-	if( channel <= CALIB_CH_NONE || channel >= CALIB_CH_COUNT)
+	if (channel <= CALIB_CH_NONE || channel >= CALIB_CH_COUNT)
 	{
 		printf("Invalid calibration channel %d \n", (int)channel);
 		return ARG_ERR;
 	}
 
-	if(reset)
+	if (reset)
 	{
 		buff[0] = channel;
 		buff[1] = RESET_CALIBRATION_KEY;
 		return i2cMem8Write(dev, I2C_MEM_CALIB_CHANNEL, buff, 2);
 	}
 
-	if( val < calLimits[channel].min || val > calLimits[channel].max)
+	if (val < calLimits[channel].min || val > calLimits[channel].max)
 	{
-		printf("Invalid calibration value, most be [%f, %f]!\n",calLimits[channel].min, calLimits[channel].max);
+		printf("Invalid calibration value, most be [%f, %f]!\n",
+			calLimits[channel].min, calLimits[channel].max);
 		return ARG_ERR;
 	}
 	rawVal = (int)round(val * SCALE_FACTOR);
@@ -172,6 +194,16 @@ int boardCheck(void)
 	}
 	gServoEnable = buff[0];
 	return OK;
+}
+
+void busyWait(int ms)
+{
+  struct timespec sleeper, dummy ;
+
+  sleeper.tv_sec  = (time_t)(ms / 1000) ;
+  sleeper.tv_nsec = (long)(ms % 1000) * 1000000 ;
+
+  nanosleep (&sleeper, &dummy) ;
 }
 
 int doHelp(int argc, char *argv[]);
@@ -443,6 +475,23 @@ int doOptoRead(int argc, char *argv[])
 	return ret;
 }
 
+int vInRead(int dev, float *value)
+{
+	u8 buff[2];
+	int resp = 0;
+
+	resp = i2cMem8Read(dev, I2C_MEM_V_IN_ADD, buff, 2);
+	if (FAIL == resp)
+	{
+		printf("Fail to read!\n");
+		return FAIL;
+	}
+
+	memcpy(&resp, buff, 2);
+	*value = (float)resp / 1000;
+	return OK;
+}
+
 int doVinRead(int argc, char *argv[]);
 const CliCmdType CMD_VIN_READ =
 {
@@ -457,7 +506,7 @@ const CliCmdType CMD_VIN_READ =
 int doVinRead(int argc, char *argv[])
 {
 	int dev = -1;
-	u8 buff[2];
+	float value = 0;
 	int resp = 0;
 
 	UNUSED(argv);
@@ -470,29 +519,26 @@ int doVinRead(int argc, char *argv[])
 	{
 		return FAIL;
 	}
-	resp = i2cMem8Read(dev, I2C_MEM_V_IN_ADD, buff, 2);
-	if (FAIL == resp)
+	resp = vInRead(dev, &value);
+	if (OK != resp)
 	{
-		printf("Fail to read!\n");
-		return FAIL;
+		return resp;
 	}
 
-	memcpy(&resp, buff, 2);
-	printf("%.3f\n", (float)resp / 1000);
+	printf("%.3f\n", value);
 	return OK;
 }
 
-
 int doVinCal(int argc, char *argv[]);
 const CliCmdType CMD_VIN_CAL =
-{
-	"vincal",
-	1,
-	&doVinCal,
-	"\tvincal		Calibrate 0-10V input port (Calibration must be done in 2 points closer to the full scale)\n",
-	"\tUsage:		lkit vincal <val>\n",
-	"",
-	"\tExample:		lkit vincal 1.23  Calibrate the 0-10V input port at 1.23V\n"};
+	{
+		"vincal",
+		1,
+		&doVinCal,
+		"\tvincal		Calibrate 0-10V input port (Calibration must be done in 2 points closer to the full scale)\n",
+		"\tUsage:		lkit vincal <val>\n",
+		"",
+		"\tExample:		lkit vincal 1.23  Calibrate the 0-10V input port at 1.23V\n"};
 
 int doVinCal(int argc, char *argv[])
 {
@@ -527,7 +573,7 @@ const CliCmdType CMD_VIN_CAL_RST =
 int doVinCalRst(int argc, char *argv[])
 {
 	int dev = -1;
-	
+
 	UNUSED(argv);
 	if (argc != 2)
 	{
@@ -539,11 +585,9 @@ int doVinCalRst(int argc, char *argv[])
 	{
 		return FAIL;
 	}
-	
+
 	return calib(dev, 0, CALIB_CH_V_IN, 1);
 }
-
-
 
 int doVoutRead(int argc, char *argv[]);
 const CliCmdType CMD_VOUT_READ =
@@ -585,6 +629,39 @@ int doVoutRead(int argc, char *argv[])
 	return OK;
 }
 
+int vOutWrite(int dev, float value)
+{
+	u8 buff[2];
+	int resp = 0;
+	u16 aux = 0;
+
+	if (0 != gServoEnable)
+	{
+		buff[0] = 0;
+		resp = i2cMem8Write(dev, I2C_MEM_SERVO_ENABLE, buff, 1);
+		if (FAIL == resp)
+		{
+			printf("Fail to write!\n");
+			return FAIL;
+		}
+	}
+
+	if (value > 10 || value < 0)
+	{
+		return ARG_ERR;
+	}
+
+	aux = (u16)round(value * 1000);
+	memcpy(buff, &aux, 2);
+	resp = i2cMem8Write(dev, I2C_MEM_V_OUT_ADD, buff, 2);
+	if (FAIL == resp)
+	{
+		printf("Fail to write!\n");
+		return FAIL;
+	}
+	return OK;
+}
+
 int doVoutWrite(int argc, char *argv[]);
 const CliCmdType CMD_VOUT_WRITE =
 	{
@@ -599,10 +676,7 @@ const CliCmdType CMD_VOUT_WRITE =
 int doVoutWrite(int argc, char *argv[])
 {
 	int dev = -1;
-	int resp = 0;
 	float value = 0;
-	int val = 0;
-	u8 buff[2];
 
 	if (argc != 3)
 	{
@@ -614,28 +688,88 @@ int doVoutWrite(int argc, char *argv[])
 	{
 		return FAIL;
 	}
-	if(0 != gServoEnable)
+	value = atof(argv[2]);
+	return vOutWrite(dev, value);
+}
+
+
+#define TEST_V_LOW_POINT (float)0
+#define TEST_V_HIGH_POINT (float)10
+#define TEST_V_SPAN (float)0.6
+#define TEST_V_N_POINTS 2
+
+int doVTst(int argc, char *argv[]);
+const CliCmdType CMD_V_TEST =
 	{
-		buff[0] = 0;
-		resp = i2cMem8Write(dev,I2C_MEM_SERVO_ENABLE, buff, 1);
-		if( FAIL == resp)
+		"vtst",
+		1,
+		&doVTst,
+		"\tvtst  		Test the current input and output port /n",
+		"\tUsage:		lkit vtst\n",
+		"",
+		"\tExample:		lkit vtst  Tests  the 0-10V input and output ports connected through the loopback cable\n"};
+
+int doVTst(int argc, char *argv[])
+{
+	int dev = -1;
+	int resp = 0;
+	float value = 0;
+	const float testPoints[TEST_V_N_POINTS] =
+	{
+		TEST_V_LOW_POINT,
+		TEST_V_HIGH_POINT };
+	int i = 0;
+
+	UNUSED(argv);
+	if (argc != 2)
+	{
+		return ARG_CNT_ERR;
+	}
+
+	dev = doBoardInit();
+	if (dev <= 0)
+	{
+		return FAIL;
+	}
+	for (i = 0; i < TEST_V_N_POINTS; i++)
+	{
+		resp = vOutWrite(dev, testPoints[i]);
+		if (resp != OK)
 		{
-			printf("Fail to write!\n");
+			return resp;
+		}
+		busyWait(300);
+		resp = vInRead(dev, &value);
+		if (resp != OK)
+		{
+			return resp;
+		}
+		if ( ( (testPoints[i] - value) < -TEST_V_SPAN )
+			|| ( (testPoints[i] - value) > TEST_V_SPAN ))
+		{
+			printf(
+				"Test fail!\n Expected: %.3f read: %.3f. Make sure the loopback cable is connected between 0-10V IN and OUT connectors\n", testPoints[i], value);
 			return FAIL;
 		}
 	}
-	value = atof(argv[2]);
-	if( value > 10 || value < 0)
+	printf("Voltage loop test PASSED.\n");
+	return OK;
+}
+
+int iInRead(int dev, float *value)
+{
+	u8 buff[2];
+	int resp = 0;
+
+	resp = i2cMem8Read(dev, I2C_MEM_I_IN_ADD, buff, 2);
+	if (FAIL == resp)
 	{
-		return ARG_ERR;
-	}
-	val = (u16)round(value * 1000);
-	resp = writeU16(dev, I2C_MEM_V_OUT_ADD, val);
-	if (OK != resp)
-	{
-		printf("Fail to write!\n");
+		printf("Fail to read!\n");
 		return FAIL;
 	}
+
+	memcpy(&resp, buff, 2);
+	*value = (float)resp / 1000;
 	return OK;
 }
 
@@ -653,7 +787,7 @@ const CliCmdType CMD_IIN_READ =
 int doIinRead(int argc, char *argv[])
 {
 	int dev = -1;
-	u8 buff[2];
+	float value = 0;
 	int resp = 0;
 
 	UNUSED(argv);
@@ -667,29 +801,26 @@ int doIinRead(int argc, char *argv[])
 	{
 		return FAIL;
 	}
-	resp = i2cMem8Read(dev, I2C_MEM_I_IN_ADD, buff, 2);
+	resp = iInRead(dev, &value);
 	if (FAIL == resp)
 	{
 		printf("Fail to read!\n");
 		return FAIL;
 	}
-
-	memcpy(&resp, buff, 2);
-	printf("%.3f\n", (float)resp / 1000);
+	printf("%.3f\n", value);
 	return OK;
 }
 
-
 int doIinCal(int argc, char *argv[]);
 const CliCmdType CMD_IIN_CAL =
-{
-	"iincal",
-	1,
-	&doIinCal,
-	"\tiincal		Calibrate 4-20mA input port (Calibration must be done in 2 points closer to the full scale)\n",
-	"\tUsage:		lkit iincal <val>\n",
-	"",
-	"\tExample:		lkit iincal 4.23  Calibrate the 4-20mA input port at 4.23mA\n"};
+	{
+		"iincal",
+		1,
+		&doIinCal,
+		"\tiincal		Calibrate 4-20mA input port (Calibration must be done in 2 points closer to the full scale)\n",
+		"\tUsage:		lkit iincal <val>\n",
+		"",
+		"\tExample:		lkit iincal 4.23  Calibrate the 4-20mA input port at 4.23mA\n"};
 
 int doIinCal(int argc, char *argv[])
 {
@@ -724,7 +855,7 @@ const CliCmdType CMD_IIN_CAL_RST =
 int doIinCalRst(int argc, char *argv[])
 {
 	int dev = -1;
-	
+
 	UNUSED(argv);
 	if (argc != 2)
 	{
@@ -736,7 +867,7 @@ int doIinCalRst(int argc, char *argv[])
 	{
 		return FAIL;
 	}
-	
+
 	return calib(dev, 0, CALIB_CH_I_IN, 1);
 }
 
@@ -780,6 +911,39 @@ int doIoutRead(int argc, char *argv[])
 	return OK;
 }
 
+int iOutWrite(int dev, float value)
+{
+	u8 buff[2];
+	int resp = 0;
+	u16 aux = 0;
+
+	if (0 != gServoEnable)
+	{
+		buff[0] = 0;
+		resp = i2cMem8Write(dev, I2C_MEM_SERVO_ENABLE, buff, 1);
+		if (FAIL == resp)
+		{
+			printf("Fail to write!\n");
+			return FAIL;
+		}
+	}
+
+	if (value > 20 || value < 4)
+	{
+		return ARG_ERR;
+	}
+
+	aux = (u16)round(value * 1000);
+	memcpy(buff, &aux, 2);
+	resp = i2cMem8Write(dev, I2C_MEM_I_OUT_ADD, buff, 2);
+	if (FAIL == resp)
+	{
+		printf("Fail to write!\n");
+		return FAIL;
+	}
+	return OK;
+}
+
 int doIoutWrite(int argc, char *argv[]);
 const CliCmdType CMD_IOUT_WRITE =
 	{
@@ -794,11 +958,8 @@ const CliCmdType CMD_IOUT_WRITE =
 int doIoutWrite(int argc, char *argv[])
 {
 	int dev = -1;
-	u8 buff[2];
-	int resp = 0;
 	float value = 0;
-	u16 aux = 0;
-	
+
 	if (argc != 3)
 	{
 		return ARG_CNT_ERR;
@@ -808,30 +969,71 @@ int doIoutWrite(int argc, char *argv[])
 	{
 		return FAIL;
 	}
-	if(0 != gServoEnable)
+	value = atof(argv[2]);
+
+	return iOutWrite(dev, value);
+}
+
+#define TEST_LOW_POINT (float)4
+#define TEST_HIGH_POINT (float)20
+#define TEST_SPAM (float)0.2
+#define TEST_N_POINTS 2
+
+int doITst(int argc, char *argv[]);
+const CliCmdType CMD_I_TEST =
 	{
-		buff[0] = 0;
-		resp = i2cMem8Write(dev,I2C_MEM_SERVO_ENABLE, buff, 1);
-		if( FAIL == resp)
+		"itst",
+		1,
+		&doITst,
+		"\titst  		Test the current input and output port /n",
+		"\tUsage:		lkit itst\n",
+		"",
+		"\tExample:		lkit itst  Tests  the 4_20mA input and output ports connected through the loopback cable\n"};
+
+int doITst(int argc, char *argv[])
+{
+	int dev = -1;
+	int resp = 0;
+	float value = 0;
+	const float testPoints[TEST_N_POINTS] =
+	{
+		TEST_LOW_POINT,
+		TEST_HIGH_POINT };
+	int i = 0;
+
+	UNUSED(argv);
+	if (argc != 2)
+	{
+		return ARG_CNT_ERR;
+	}
+
+	dev = doBoardInit();
+	if (dev <= 0)
+	{
+		return FAIL;
+	}
+	for (i = 0; i < TEST_N_POINTS; i++)
+	{
+		resp = iOutWrite(dev, testPoints[i]);
+		if (resp != OK)
 		{
-			printf("Fail to write!\n");
+			return resp;
+		}
+		busyWait(300);
+		resp = iInRead(dev, &value);
+		if (resp != OK)
+		{
+			return resp;
+		}
+		if ( ( (testPoints[i] - value) < -TEST_SPAM )
+			|| ( (testPoints[i] - value) > TEST_SPAM ))
+		{
+			printf(
+				"Test fail!\n Expected: %.3f read: %.3f. Make sure the loopback cable is connected between 4-20mA IN and OUT connectors\n", testPoints[i], value);
 			return FAIL;
 		}
 	}
-	value = atof(argv[2]);
-	if (value > 20 || value < 4)
-	{
-		return ARG_ERR;
-	}
-
-	aux = (u16)round(value * 1000);
-	memcpy(buff, &aux, 2);
-	resp = i2cMem8Write(dev, I2C_MEM_I_OUT_ADD, buff, 2);
-	if (FAIL == resp)
-	{
-		printf("Fail to write!\n");
-		return FAIL;
-	}
+	printf("Current loop test PASSED.\n");
 	return OK;
 }
 
@@ -947,7 +1149,7 @@ int doServoRead(int argc, char *argv[])
 		return ARG_CNT_ERR;
 	}
 	channel = atoi(argv[2]);
-	if(1 != channel && 2 != channel)
+	if (1 != channel && 2 != channel)
 	{
 		return ARG_ERR;
 	}
@@ -971,14 +1173,14 @@ int doServoRead(int argc, char *argv[])
 
 int doServoWrite(int argc, char *argv[]);
 const CliCmdType CMD_SERVO_WRITE =
-{
-	"servowr",
-	1,
-	&doServoWrite,
-	"\tservowr		Set the servo position (-100..100) for standard (-140..140) for extended range servo's \n",
-	"\tUsage:		lkit servowr <channel> <value(%)>\n",
-	"",
-	"\tExample:		lkit servowr 1 25.2  Set the servo 1 position to 25.2%  \n"};
+	{
+		"servowr",
+		1,
+		&doServoWrite,
+		"\tservowr		Set the servo position (-100..100) for standard (-140..140) for extended range servo's \n",
+		"\tUsage:		lkit servowr <channel> <value(%)>\n",
+		"",
+		"\tExample:		lkit servowr 1 25.2  Set the servo 1 position to 25.2%  \n"};
 
 int doServoWrite(int argc, char *argv[])
 {
@@ -994,7 +1196,7 @@ int doServoWrite(int argc, char *argv[])
 		return ARG_CNT_ERR;
 	}
 	channel = atoi(argv[2]);
-	if(1 != channel && 2 != channel)
+	if (1 != channel && 2 != channel)
 	{
 		return ARG_ERR;
 	}
@@ -1008,11 +1210,11 @@ int doServoWrite(int argc, char *argv[])
 	{
 		return FAIL;
 	}
-	if(0 == gServoEnable)
+	if (0 == gServoEnable)
 	{
 		buff[0] = 1;
-		resp = i2cMem8Write(dev,I2C_MEM_SERVO_ENABLE, buff, 1);
-		if( FAIL == resp)
+		resp = i2cMem8Write(dev, I2C_MEM_SERVO_ENABLE, buff, 1);
+		if (FAIL == resp)
 		{
 			printf("Fail to write!\n");
 			return FAIL;
@@ -1020,7 +1222,7 @@ int doServoWrite(int argc, char *argv[])
 	}
 	aux = (s16)round(value * 10);
 	memcpy(buff, &aux, 2);
-	
+
 	resp = i2cMem8Write(dev, I2C_MEM_SERVO_VAL1 + 2 * (channel - 1), buff, 2);
 	if (FAIL == resp)
 	{
@@ -1038,7 +1240,7 @@ const CliCmdType CMD_LED_WRITE =
 	&doLedWrite,
 	"\tledwr		Set the state of general purpose LEDS on the card\n",
 	"\tUsage:		lkit ledwr <led[1..4]> <state(0/1)>\n",
-	"\tUsage:		lkit ledwr <value[0..15]>",
+	"\tUsage:		lkit ledwr <value[0..15]>\n",
 	"\tExample:		lkit ledwr 1 1  Turn ON the LED #1\n"};
 
 int doLedWrite(int argc, char *argv[])
@@ -1124,6 +1326,8 @@ const CliCmdType *gCmdArray[] =
 	&CMD_SERVO_READ,
 	&CMD_SERVO_WRITE,
 	&CMD_LED_WRITE,
+	&CMD_I_TEST,
+	&CMD_V_TEST,
 	NULL};
 
 int main(int argc, char *argv[])
@@ -1152,7 +1356,7 @@ int main(int argc, char *argv[])
 						printf("%s", gCmdArray[i]->usage2);
 					}
 				}
-				else if(ret == ARG_ERR)
+				else if (ret == ARG_ERR)
 				{
 					printf("Invalid parameters!\n");
 					printf("%s", gCmdArray[i]->usage1);
