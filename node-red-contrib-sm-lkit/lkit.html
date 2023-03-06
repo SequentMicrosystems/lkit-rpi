@@ -861,3 +861,98 @@
     },
   });
 </script>
+
+
+
+<script type="text/html" data-template-name="LKIT SERVO">
+  <div class="form-row">
+      <label for="node-input-sero"><i class="fa fa-empire"></i> Servo Number</label>
+      <input id="node-input-servo" class="lkit-out-servo" placeholder="[msg.servo]" min=1 max=2 style="width:100px; height:16px;">
+  </div>
+  
+  <div class="form-row">
+      <label for="node-input-payload"><i class="fa fa-envelope"></i> Payload</span></label>
+      <input type="text" id="node-input-payload" style="width:70%">
+      <input type="hidden" id="node-input-payloadType">
+  </div>
+  
+  <div class="form-row">
+      <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+      <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+</script>
+
+<script type="text/html" data-help-name="LKIT SERVO">
+  <p>
+    Provides a connection to an Sequent Microsystems Learning Kit Card servos.
+  </p>
+  <p>Set one servo with the value received in <code>msg.payload</code></p>
+  <p>
+    You can specify the servo number in the edit dialog box or programaticaly
+    with the input message <code>msg.servo</code>
+  </p>
+</script>
+
+<script type="text/javascript">
+  RED.nodes.registerType("LKIT SERVO", {
+    category: "Sequent Microsystems",
+    defaults: {
+      name: { value: "" },
+      servo: { value: "1" },
+      payload: {
+        value: "payload",
+        required: false,
+        validate: RED.validators.typedInput("payloadType"),
+      },
+      payloadType: { value: "msg" },
+    },
+    color: "#7a9da6",
+    inputs: 1,
+    outputs: 0,
+    icon: "servo.png",
+    align: "right",
+    label: function () {
+      return this.name || "LKIT SERVO";
+    },
+    labelStyle: function () {
+      return this.name ? "node_label_italic" : "";
+    },
+    oneditprepare: function () {
+      if (this.payloadType == null) {
+        this.payloadType = "msg";
+      } else if (this.payloadType === "string") {
+        this.payloadType = "str";
+      }
+
+      if (this.servo === undefined) {
+        $("#node-input-servo").val(1);
+      }
+      $("#node-input-servo").spinner({
+        min: 1,
+        max: 2,
+      });
+      $("#node-input-payload").typedInput({
+        default: "msg",
+        typeField: $("#node-input-payloadType"),
+        types: ["msg", "flow", "global", "str", "num", "bool", "json", "bin"],
+      });
+      $("#node-input-payload").typedInput("type", this.payloadType);
+      $("#node-input-payloadType").val(this.payloadType);
+      if (
+        $("#node-input-payload").typedInput("type") === "msg" &&
+        $("#node-input-payload").typedInput("value") === ""
+      ) {
+        $("#node-input-payload").typedInput("value", "payload");
+      }
+
+      $("#node-input-payload").on("change", function () {
+        if (
+          $("#node-input-payload").typedInput("type") === "msg" &&
+          $("#node-input-payload").typedInput("value") === ""
+        ) {
+          $("#node-input-payload").typedInput("value", "payload");
+        }
+      });
+    },
+  });
+</script>

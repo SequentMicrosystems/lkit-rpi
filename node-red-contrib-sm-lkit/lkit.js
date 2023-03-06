@@ -11,7 +11,9 @@ module.exports = function (RED) {
   const I2C_MEM_I4_20_IN_VAL1 = 12;
   const I2C_MEM_LED_SET_ADD = 22;
   const I2C_MEM_LED_CLR_ADD = 23;
-  const I2C_MEM_LED_VAL_ADD = 24;
+    const I2C_MEM_LED_VAL_ADD = 24;
+    const I2C_MEM_SERVO_VAL1 = 26;
+    const I2C_MEM_SERVO_VAL2 = 28;
 
   const gInPins = new ArrayBuffer(4);
   gInPins[0] = 7; //4;
@@ -697,5 +699,101 @@ module.exports = function (RED) {
     });
   }
 
-  RED.nodes.registerType("LKIT BUTTON", ButtonNode);
+    RED.nodes.registerType("LKIT BUTTON", ButtonNode);
+
+    function ServoOutNode(n) {
+        RED.nodes.createNode(this, n);
+        this.servo = parseInt(n.servo);
+        this.payload = n.payload;
+        this.payloadType = n.payloadType;
+        var node = this;
+        var buffer = Buffer.alloc(2);
+
+        node.port = I2C.openSync(1);
+        node.on("input", function (msg) {
+            var myPayload;
+            var servo = node.servo;
+            if (isNaN(servo)) servo = msg.servo;
+            servo = parseInt(servo);
+            if (isNaN(servo)) {
+                this.status({
+                    fill: "red",
+                    shape: "ring",
+                    text: "Servo number  (" + servo + ") value is missing or incorrect",
+                });
+                return;
+            } else {
+                this.status({});
+            }
+
+            if (servo < 1) {
+                servo = 1;
+            }
+            if (servo > 2) {
+                servo = 2;
+            }
+
+            //var buffcount = parseInt(node.count);
+            if (this.payloadType == null) {
+                myPayload = this.payload;
+            } else if (this.payloadType == "none") {
+                myPayload = null;
+            } else {
+                myPayload = RED.util.evaluateNodeProperty(
+                    this.payload,
+                    this.payloadType,
+                    this,
+                    msg
+                );
+            }
+            if (isNaN(myPayload)) {
+                this.status({
+                    fill: "red",
+                    shape: "ring",
+                    text:
+                        "Payload type must be a number  (" +
+                        this.payload +
+                        ") value is missing or incorrect myPayload: (" +
+                        myPayload +
+                        ")",
+                });
+                return;
+            } else {
+                this.status({});
+            }
+            try {
+                var hwAdd = DEFAULT_HW_ADD;
+
+                if (myPayload < -140) {
+                    myPayload = -140;
+                }
+                if (myPayload > 140) {
+                    myPayload = 140;
+                }
+                var address = I2C_MEM_SERVO_VAL1 + 2 * (servo - 1);
+                var intVal = Math.round(myPayload * 10);
+                intVal = 0xffff & ((intVal << 16) >> 16); //Dimitry Soshnikov method
+                node.port.writeWord(
+                    hwAdd,
+                    address,
+                    intVal,
+                    function (err, size, res) {
+                        if (err) {
+                            node.error(err, msg);
+                        } else {
+                            //rmsg.payload = res.readIntLE(0, 2) / 1000.0;
+                            node.send(msg);
+                        }
+                    }
+                );
+            } catch (err) {
+                this.error(err, msg);
+            }
+        });
+
+        node.on("close", function () {
+            node.port.closeSync();
+        });
+    }
+    RED.nodes.registerType("LKIT SERVO", ServoOutNode);
 };
