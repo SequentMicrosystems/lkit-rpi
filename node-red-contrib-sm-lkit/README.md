@@ -6,6 +6,12 @@ This is the node-red node to control Sequent Microsystems Learning Kit Card
 
 Clone or update the repository, following the instrutions from the [first page.](https://github.com/SequentMicrosystems/lkit-rpi)
 
+Recently Node-RED install does not include the *rpio* so you have to mannualy install it:
+
+```bash
+~$ npm install rpio
+```
+
 In your node-red user directory, tipicaly ~/.node-red,
 
 ```bash
